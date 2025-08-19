@@ -1,0 +1,43 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # --- [NO CACHE para /api/*] ---
+    # Marca las peticiones /api/* con una variable de entorno antes de cualquier rewrite
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    RewriteRule ^ - [E=API_NOCACHE:1]
+    # --- fin ---
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# --- [Headers NO CACHE aplicados a /api/*] ---
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0" env=API_NOCACHE
+    Header set Pragma "no-cache" env=API_NOCACHE
+    Header set Expires "0" env=API_NOCACHE
+</IfModule>
+
+# --- [PDFs sin caché en cualquier ruta] ---
+<IfModule mod_headers.c>
+    <FilesMatch "\.pdf$">
+        Header set Cache-Control "private, no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>

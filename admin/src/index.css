@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #e1251b;
+  --color-primary-dark: #aa182c;
+  --color-secondary: #e1251b;
+}
+
+@layer components {
+  .text-shadow {
+    color: #112246;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* HTML: <div class="loader"></div> */
+.loader-loading {
+  width: 30px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 4px solid lightblue;
+  border-right-color: var(--color-primary);
+  animation: l2 1s infinite linear;
+}
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 8px solid lightblue;
+  border-right-color: var(--color-primary);
+  animation: l2 1s infinite linear;
+}
+@keyframes l2 {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.sidebar {
+  overflow: auto;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 7px;
+  height: 5px;
+}
+
+/* Handle */
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-secondary);
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+.rbc-toolbar button {
+  background-color: var(--color-primary) !important;
+  color: #fff !important;
+  border-color: var(--color-primary-dark) !important;
+}
+
+.rbc-toolbar button:focus {
+  background-color: var(--color-primary-dark) !important;
+  color: #fff !important;
+}
+
+.rbc-event {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* FullCalendar */
+.fc-daygrid-event-harness,
+.fc-event-main {
+  max-width: 8rem !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.fc-event-main-frame {
+  display: flex !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.truncate-event {
+  width: 8rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
