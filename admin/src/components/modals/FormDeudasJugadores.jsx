@@ -58,7 +58,7 @@ export const FormDeudasJugadores = ({
           value={formData.fecha_limite || ''}
           onChange={handleInputChange}
           disabled={
-            (formData.estatus === 'Cancelado' && name !== 'estatus') ||
+            formData.estatus === 'Cancelado' ||
             ['Pagado', 'Parcial'].includes(formData.estatus)
               ? true
               : view
@@ -79,7 +79,7 @@ export const FormDeudasJugadores = ({
                 required={required}
                 value={formData[name] || ''}
                 onChange={handleInputChange}
-                disabled={view}
+                disabled={formData.estatus === 'Parcial' ? true : view}
                 opcSelect={opcSelect}
                 classInput={
                   name === 'notas' ? 'md:col-span-2' : 'md:col-span-1'
@@ -88,32 +88,32 @@ export const FormDeudasJugadores = ({
             )
         )}
 
-      {/* {formData.estatus === 'Pagado' && ( */}
-      <>
-        <div className='sm:col-span-6 md:col-span-2'>
-          <AlertaCard text='Información del pago' />
-        </div>
+      {formData.estatus === 'Pagado' && (
+        <>
+          <div className='sm:col-span-6 md:col-span-2'>
+            <AlertaCard text='Información del pago' />
+          </div>
 
-        {formOptions.pagadoFiels.map(
-          ({ type, label, name, required, opcSelect, condition }) =>
-            (!condition || condition(formData.metodo_pago)) && (
-              <InputField
-                key={name}
-                type={type}
-                label={label}
-                name={name}
-                required={required}
-                value={name === 'banco_id' ? null : formData[name] ?? ''}
-                onChange={handleInputChange}
-                disabled={view}
-                opcSelect={opcSelect}
-                loadOptions={loadOptionsBancos}
-                classInput={'md:col-span-2'}
-              />
-            )
-        )}
-      </>
-      {/* )} */}
+          {formOptions.pagadoFiels.map(
+            ({ type, label, name, required, opcSelect, condition }) =>
+              (!condition || condition(formData.metodo_pago)) && (
+                <InputField
+                  key={name}
+                  type={type}
+                  label={label}
+                  name={name}
+                  required={required}
+                  value={formData[name] || ''}
+                  onChange={handleInputChange}
+                  disabled={view}
+                  opcSelect={opcSelect}
+                  loadOptions={loadOptionsBancos}
+                  classInput={'md:col-span-2'}
+                />
+              )
+          )}
+        </>
+      )}
     </div>
   )
 }
