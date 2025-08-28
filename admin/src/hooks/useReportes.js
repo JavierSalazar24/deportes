@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { getBanco } from '../api/bancos'
 import {
   getEstadoCuentaBanco,
+  getEstadoCuentaJugadores,
   getEstadoCuentaProveedor,
   getReporte
 } from '../api/reportes'
@@ -129,15 +130,13 @@ export const useReportes = () => {
         loadOptionsJugadores.cachedData = await getJugadores()
       }
 
-      const filteredData = loadOptionsJugadores.cachedData.filter(
-        (g) =>
-          g.nombre_completo.toLowerCase().includes(inputValue.toLowerCase()) ||
-          g.numero_empleado.toLowerCase().includes(inputValue.toLowerCase())
+      const filteredData = loadOptionsJugadores.cachedData.filter((g) =>
+        g.jugador.toLowerCase().includes(inputValue.toLowerCase())
       )
 
       return filteredData.map((data) => ({
         value: data.id,
-        label: data.nombre_completo
+        label: data.jugador
       }))
     } catch (error) {
       console.error('Error cargando datos:', error)
@@ -389,6 +388,11 @@ export const useReportes = () => {
     setEstado(data)
   }
 
+  const generateEstadoCuentaJugadores = async (form) => {
+    const data = await getEstadoCuentaJugadores(form)
+    setEstado(data)
+  }
+
   // Funciones de transformación específicas por módulo
   function transformMovimientData(res) {
     return {
@@ -531,6 +535,7 @@ export const useReportes = () => {
     loadOptionsTemporadas,
     generateReport,
     generateEstadoCuentaProveedor,
-    generateEstadoCuentaBanco
+    generateEstadoCuentaBanco,
+    generateEstadoCuentaJugadores
   }
 }

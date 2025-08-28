@@ -2,7 +2,6 @@ import {
   Archive,
   BarChart3,
   Landmark,
-  ShieldUser,
   UsersRound,
   ArrowRightLeft,
   Settings,
@@ -11,13 +10,22 @@ import {
   Volleyball,
   NotepadTextDashed,
   CreditCard,
-  FolderClock
+  FolderClock,
+  Image
 } from 'lucide-react'
 
 export const routes = [
   { path: '/', label: 'Dashboard', Icon: BarChart3 },
-  { path: '/jugadores', label: 'Jugadores', Icon: Volleyball },
-  { path: '/equipo', label: 'Utilería', Icon: ShieldUser },
+  { path: '/banners', label: 'Banners', Icon: Image },
+  {
+    label: 'Jugadores',
+    Icon: Volleyball,
+    children: [
+      { path: '/jugadores', label: 'Jugadores' },
+      { path: '/equipo', label: 'Utilería' },
+      { path: '/estadocuenta-jugadores', label: 'Estado de cuenta' }
+    ]
+  },
   {
     label: 'Gestión deportiva',
     Icon: NotepadTextDashed,

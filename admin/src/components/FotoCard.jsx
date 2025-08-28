@@ -21,7 +21,7 @@ export const FotoCard = ({
         <AlertaCard text={title} />
       </div>
 
-      <div className='sm:col-span-6 md:col-span-2 w-96 mx-auto'>
+      <div className='sm:col-span-6 md:col-span-2 sm:w-96 mx-auto'>
         <div
           onClick={handleFileBoxClick}
           className='cursor-pointer border-2 border-dashed border-gray-300 rounded-lg p-4 transition-all hover:border-blue-500 flex flex-col items-center justify-center'

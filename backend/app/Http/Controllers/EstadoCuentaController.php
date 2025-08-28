@@ -196,4 +196,168 @@ class EstadoCuentaController extends Controller
             ]
         ]);
     }
+
+    public function generarPdfEstadoCuentaJugador(Request $request)
+    {
+        $data = $this->generarEstadoCuentaJugador($request)->getData(true);
+        $pdf = Pdf::loadView('pdf.estado_cuenta_jugador', ['data' => $data]);
+        return $pdf->stream('estado_cuenta_jugador_' . $data['jugador']['nombre'] . $data['jugador']['apellido_p'] . $data['jugador']['apellido_m'] . '.pdf');
+    }
+
+    public function generarEstadoCuentaJugador(Request $request)
+    {
+        $request->validate([
+            'jugador_id'   => 'required|exists:jugadores,id',
+            'fecha_inicio' => 'nullable|date',
+            'fecha_fin'    => 'nullable|date|after_or_equal:fecha_inicio',
+        ]);
+
+        $jugadorId = (int) $request->jugador_id;
+        $jugador =  Jugador::with(['categoria.temporada', 'usuario'])->find($jugadorId);
+        $inicio    = $request->filled('fecha_inicio') ? Carbon::parse($request->fecha_inicio)->startOfDay() : null;
+        $fin       = $request->filled('fecha_fin')    ? Carbon::parse($request->fecha_fin)->endOfDay()     : null;
+
+        // -------- DEUDAS (con abonos acumulados y relaciones para tu tabla) --------
+        $deudasQuery = DeudaJugador::query()
+            ->deJugador($jugadorId)
+            ->with([
+               'jugador',
+                'costo_categoria.concepto_cobro',
+                'costo_categoria.categoria.temporada',
+                'pagos_jugadores.banco',
+            ])
+            // Traemos el total de abonos por deuda (alias de columna calculada)
+            ->withSum('abonos_deudas as total_abonado', 'monto');
+
+
+        if ($inicio && $fin) {
+            // Si deseas limitar por la fecha compromiso de pago
+            $deudasQuery->whereBetween('fecha_pago', [$inicio, $fin]);
+        }
+
+        $deudas = $deudasQuery
+            ->orderBy('estatus')
+            ->get()
+            // mapeo para payload “tabla friendly”
+            ->map(function (DeudaJugador $d) {
+                return [
+                    'id'               => $d->id,
+                    'fecha_pago'       => $d->fecha_pago,
+                    'fecha_limite'     => $d->fecha_limite,
+                    'estatus'          => $d->estatus,         // Pendiente/Parcial/Pagado/Cancelado
+                    'monto_base'       => (float)$d->monto_base,
+                    'extra'            => (float)$d->extra,
+                    'descuento'        => (float)$d->descuento,
+                    'monto_final'      => (float)$d->monto_final,
+                    'saldo_restante'   => (float)$d->saldo_restante,
+                    'total_abonado'    => (float)$d->total_abonado, // para mostrar en tu tabla
+                    'notas'            => $d->notas,
+                    'concepto'         => $d->costo_categoria->concepto_cobro->nombre. " ({$d->costo_categoria->categoria->nombre})",
+                    'categoria'        => $d->costo_categoria->categoria->nombre,
+                    'temporada'        => $d->costo_categoria->categoria->temporada->nombre,
+                ];
+            });
+
+        // -------- ABONOS (detalle) --------
+        $abonosQuery = AbonoDeudaJugador::query()
+            ->with([
+                'deuda_jugador.jugador',
+                'deuda_jugador.costo_categoria.concepto_cobro',
+                'deuda_jugador.costo_categoria.categoria.temporada',
+                'banco'
+            ])
+            ->whereHas('deuda_jugador', fn($q) => $q->where('jugador_id', $jugadorId));
+
+        if ($inicio && $fin) {
+            $abonosQuery->whereBetween('fecha', [$inicio, $fin]);
+        }
+
+        $abonos = $abonosQuery
+            ->orderBy('fecha')
+            ->get()
+            ->map(function (AbonoDeudaJugador $a) {
+                return [
+                    'id'             => $a->id,
+                    'fecha'          => $a->fecha,
+                    'monto'          => (float)$a->monto,
+                    'metodo_pago'    => $a->metodo_pago,
+                    'referencia'     => $a->referencia ?? '-',
+                    'observaciones'  => $a->observaciones,
+                    'banco'          => $a->banco?->nombre,
+                    'deuda_id'       => $a->deuda_jugador_id,
+                    'concepto'       => $a->deuda_jugador->costo_categoria->concepto_cobro->nombre. " ({$a->deuda_jugador->costo_categoria->categoria->nombre})",
+                ];
+            });
+
+        // -------- PAGOS (deudas liquidadas) --------
+        $pagosQuery = PagoJugador::query()
+            ->with([
+                'deuda_jugador.jugador',
+                'deuda_jugador.abonos_deudas',
+                'deuda_jugador.costo_categoria.categoria.temporada',
+                'deuda_jugador.costo_categoria.concepto_cobro',
+                'banco',
+            ])
+            ->deJugador($jugadorId);
+
+        if ($inicio && $fin) {
+            $pagosQuery->whereBetween('fecha_pagado', [$inicio, $fin]);
+        }
+
+        $pagos = $pagosQuery
+            ->orderBy('fecha_pagado')
+            ->get()
+            ->map(function (PagoJugador $p) {
+                return [
+                    'id'              => $p->id,
+                    'fecha_pagado'    => $p->fecha_pagado,
+                    'metodo_pago'     => $p->metodo_pago,
+                    'referencia'      => $p->referencia ?? '-',
+                    'banco'           => $p->banco->nombre,
+                    'deuda_id'        => $p->deuda_jugador_id,
+                    'concepto'        => $p->deuda_jugador->costo_categoria->concepto_cobro->nombre. " ({$p->deuda_jugador->costo_categoria->categoria->nombre})",
+                    'monto_final'     => (float)($p->deuda_jugador->monto_final ?? 0),
+                ];
+            });
+
+        // -------- TOTALES --------
+        // Deuda pendiente: sumamos saldo_restante de deudas en estatus Pendiente/Parcial
+        $totalDeudaPendiente = (float) DeudaJugador::query()
+            ->deJugador($jugadorId)
+            ->when($inicio && $fin, fn($q) => $q->whereBetween('fecha_pago', [$inicio, $fin]))
+            ->whereIn('estatus', ['Pendiente', 'Parcial'])
+            ->sum('saldo_restante');
+
+        // Total abonos en el periodo (o global si no hay fechas)
+        $totalAbonos = (float) AbonoDeudaJugador::query()
+            ->whereHas('deuda_jugador', fn($q) => $q->where('jugador_id', $jugadorId))
+            ->when($inicio && $fin, fn($q) => $q->whereBetween('fecha', [$inicio, $fin]))
+            ->sum('monto');
+
+        // Total pagado: tu tabla pagos no guarda monto; asumimos monto = monto_final de la deuda liquidada
+        // Si prefieres otra lógica, dime y lo ajustamos.
+        $totalPagado = (float) PagoJugador::query()
+            ->deJugador($jugadorId)
+            ->when($inicio && $fin, fn($q) => $q->whereBetween('fecha_pagado', [$inicio, $fin]))
+            ->with('deuda_jugador:id,monto_final')
+            ->get()
+            ->sum(fn($p) => (float)($p->deuda_jugador?->monto_final ?? 0));
+
+        return response()->json([
+            'jugador_id' => $jugadorId,
+            'jugador'    => $jugador,
+            'periodo'    => [
+                'inicio' => $inicio?->toDateString(),
+                'fin'    => $fin?->toDateString(),
+            ],
+            'deudas' => $deudas,
+            'abonos' => $abonos,
+            'pagos'  => $pagos,
+            'resumen'    => [
+                'total_deuda' => $totalDeudaPendiente,
+                'total_abonos'          => $totalAbonos,
+                'total_pagado'          => $totalPagado,
+            ],
+        ]);
+    }
 }

@@ -23,6 +23,11 @@ class PagoJugador extends Model {
         return $this->belongsTo(DeudaJugador::class);
     }
 
+    public function scopeDeJugador($q, $jugadorId)
+    {
+        return $q->whereHas('deuda_jugador', fn($qq) => $qq->where('jugador_id', $jugadorId));
+    }
+
     public function movimientosBancarios()
     {
         return $this->morphMany(MovimientoBancario::class, 'origen');

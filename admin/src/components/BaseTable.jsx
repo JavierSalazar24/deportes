@@ -62,7 +62,7 @@ export const BaseTable = ({
                 <button
                   key={periodo.key}
                   onClick={() => handleFiltro(periodo.key)}
-                  className={`px-3 py-2 border-2 border-[#FF3F33] rounded-md cursor-pointer hover:bg-[#FF3F33] hover:text-white transition-all ${
+                  className={`px-3 py-2 border-2 border-[#FF3F33] rounded-md cursor-pointer hover:bg-[#FF3F33] hover:text-white transition-all text-sm sm:text-base mb-2 sm:mb-0 ${
                     filtro === periodo.key
                       ? 'bg-[#FF3F33] text-white'
                       : 'bg-transparent'
@@ -78,7 +78,7 @@ export const BaseTable = ({
           <div className='p-5 flex sm:justify-center sm:gap-3 flex-col sm:flex-row'>
             <button
               onClick={handleFiltro}
-              className={`px-3 py-2 border-2 border-[#3674B5] rounded-md cursor-pointer hover:bg-[#3674B5] hover:text-white transition-all ${
+              className={`px-3 py-2 border-2 border-[#3674B5] rounded-md cursor-pointer hover:bg-[#3674B5] hover:text-white transition-all text-sm sm:text-base mb-2 sm:mb-0 ${
                 filtro ? 'bg-[#3674B5] text-white' : 'bg-transparent'
               }`}
             >
@@ -86,7 +86,7 @@ export const BaseTable = ({
             </button>
             <button
               onClick={handleFiltro}
-              className={`px-3 py-2 border-2 border-[#3674B5] rounded-md cursor-pointer hover:bg-[#3674B5] hover:text-white transition-all ${
+              className={`px-3 py-2 border-2 border-[#3674B5] rounded-md cursor-pointer hover:bg-[#3674B5] hover:text-white transition-all text-sm sm:text-base mb-2 sm:mb-0 ${
                 !filtro ? 'bg-[#3674B5] text-white' : 'bg-transparent'
               }`}
             >

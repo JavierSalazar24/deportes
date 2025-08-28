@@ -55,7 +55,7 @@ export const ContentPWATutorial = ({
         <button
           onClick={prevStep}
           disabled={currentStep === 0}
-          className={`cursor-pointer px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+          className={`cursor-pointer px-6 py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
             currentStep === 0
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
@@ -67,7 +67,7 @@ export const ContentPWATutorial = ({
         <button
           onClick={nextStep}
           disabled={currentStep === totalSteps - 1}
-          className={`cursor-pointer px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+          className={`cursor-pointer px-6 py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base ${
             currentStep === totalSteps - 1
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-blue-500 text-white hover:bg-blue-600'

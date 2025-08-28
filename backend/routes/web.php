@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\EstadoCuentaController;
 use App\Http\Controllers\EquipamientoController;
@@ -21,10 +21,10 @@ Route::get('/api/pdf/estado-cuenta-proveedores', [EstadoCuentaController::class,
 Route::get('/api/pdf/estado-cuenta-bancos', [EstadoCuentaController::class, 'generarPdfEstadoCuentaBanco']);
 Route::get('/api/pdf/equipamiento/{id}', [EquipamientoController::class, 'equipamientoPDF']);
 
-// Route::get('/cmd/{command}', function($command){
-//     Artisan::call($command);
-//     dd(Artisan::output());
-// });
+Route::get('/cmd/{command}', function($command){
+    Artisan::call($command);
+    dd(Artisan::output());
+});
 
 Route::get('/{any}', function () {
     return File::get(public_path('index.html'));

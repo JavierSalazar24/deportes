@@ -10,6 +10,7 @@ import OfflineBanner from './components/OfflineBanner'
 import OnlineBanner from './components/OnlineBanner'
 
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const BannersPage = lazy(() => import('./pages/BannersPage'))
 const JugadoresPage = lazy(() => import('./pages/JugadoresPage'))
 const EquipamientoPage = lazy(() => import('./pages/EquipamientoPage'))
 const ConceptosCobrosPage = lazy(() => import('./pages/ConceptosCobrosPage'))
@@ -114,6 +115,15 @@ export default function App() {
                 />
 
                 <Route
+                  path='/banners'
+                  element={
+                    <PrivateRoute>
+                      <BannersPage />
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
                   path='/jugadores'
                   element={
                     <PrivateRoute>
@@ -121,7 +131,14 @@ export default function App() {
                     </PrivateRoute>
                   }
                 />
-
+                <Route
+                  path='/estadocuenta-jugadores'
+                  element={
+                    <PrivateRoute>
+                      <EstadoCuentaJugadoresPage />
+                    </PrivateRoute>
+                  }
+                />
                 <Route
                   path='/equipo'
                   element={

@@ -2,51 +2,16 @@ import { create } from 'zustand'
 import { getEquipoDisponible } from '../api/equipamiento'
 import { usePermisosStore } from './usePermisosStore'
 
-export const useModalStore = create((set, get) => ({
+export const useModalStore = create((set) => ({
   isOpen: false,
   modalType: null,
   currentItem: null,
   formData: {},
   firma: null,
-  cache: {},
-  cacheExpiry: 5 * 60 * 1000,
 
   getArtDis: async (id) => {
-    const now = Date.now()
-    const { cache, cacheExpiry } = get()
-
-    // Si los datos están en caché y no han expirado
-    if (cache[id] && now - cache[id].timestamp < cacheExpiry) {
-      return cache[id].data
-    }
-
-    // Si no, hacer la petición
     const data = await getEquipoDisponible(id)
-
-    // Actualizar la caché
-    set({
-      cache: {
-        ...cache,
-        [id]: {
-          data,
-          timestamp: now
-        }
-      }
-    })
-
     return data
-  },
-
-  clearCache: (id) => {
-    const { cache } = get()
-    const newCache = { ...cache }
-    if (id) {
-      delete newCache[id]
-    } else {
-      // Limpiar toda la caché si no se especifica ID
-      Object.keys(newCache).forEach((key) => delete newCache[key])
-    }
-    set({ cache: newCache })
   },
 
   editFirma: (file) => {
