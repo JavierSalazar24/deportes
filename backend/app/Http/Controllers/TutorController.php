@@ -9,7 +9,8 @@ use App\Models\{
     PagoJugador,
     AbonoDeudaJugador,
     Partido,
-    Categoria
+    Categoria,
+    Banner
 };
 use App\Helpers\ArchivosHelper;
 use Carbon\CarbonImmutable;
@@ -39,7 +40,7 @@ class TutorController extends Controller
                 'pagos_jugadores.banco'
             ])
             ->whereIn('jugador_id', $jugadorIds)
-            ->where('estatus', 'Pendiente')
+            ->whereIn('estatus', ['Pendiente', 'Parcial'])
             ->when($temporada, fn($q) =>
                 $q->whereHas('costo_categoria.categoria.temporada', fn($t) =>
                     $t->where('id', $temporada->id)
@@ -93,14 +94,18 @@ class TutorController extends Controller
             ->orderBy('fecha_hora','asc')
             ->get();
 
+        // 7) Banners
+        $banners = Banner::all();
+
         return response()->json([
+            'banners'     => $banners->append('foto_url'),
             'jugadores'   => $jugadores->append(['curp_jugador_url', 'ine_url', 'acta_nacimiento_url', 'comprobante_domicilio_url', 'foto_url', 'firma_url']),
             'temporada'   => $temporada,
             'deudas'      => $deudas,
             'pagos'       => $pagos,
             'abonos'      => $abonos,
             'partidos'    => $partidos->append('foto_url'),
-            'totalDeudas' => $deudas->sum('monto_final'),
+            'totalDeudas' => $deudas->sum('saldo_restante'),
             'totalAbonos' => $abonos->sum('monto'),
             'totalPagos'  => $pagos->sum('monto_final'),
         ]);
@@ -158,8 +163,8 @@ class TutorController extends Controller
 
         $data['categoria_id'] = $categoria->id;
 
-        DB::transaction(function () use (&$data, $categoria) {
-
+        DB::beginTransaction();
+        try {
             $jugador = Jugador::create($data);
 
             $hoy       = CarbonImmutable::today();
@@ -208,9 +213,13 @@ class TutorController extends Controller
                     $cursor = $saltos[$costo->concepto_cobro->periodicidad]($cursor);
                 }
             });
-        });
 
-        return response()->json(['message' => 'Registro guardado'], 201);
+            DB::commit();
+            return response()->json(['message' => 'Registro guardado'], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error al registrar los datos', 'error' => $e->getMessage()], 500);
+        }
     }
 
     // * Función para subir una foto
