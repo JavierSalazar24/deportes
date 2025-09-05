@@ -20,7 +20,7 @@ class FullSistemaSeeder extends Seeder
             'equipo', 'logs','temporadas', 'categorias', 'partidos', 'calendario-partidos', 'conceptos-cobros',
             'costos-categoria', 'deudas-jugadores', 'pagos-jugadores', 'abonos-jugadores', 'historial-deudas-jugadores',
             'historial-pagos-jugadores', 'historial-abonos-jugadores', 'calendario-pagos', 'caja-pagos',
-            'generador-reportes', 'estadocuenta-proveedores', 'estadocuenta-bancos',
+            'generador-reportes', 'estadocuenta-proveedores', 'estadocuenta-bancos', 'estadocuenta-jugadores',
         ];
 
         DB::beginTransaction();

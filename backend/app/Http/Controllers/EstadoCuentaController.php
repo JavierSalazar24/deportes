@@ -12,6 +12,7 @@ use App\Models\Gasto;
 use App\Models\Jugador;
 use App\Models\PagoJugador;
 use App\Models\AbonoDeudaJugador;
+use App\Models\DeudaJugador;
 use Carbon\Carbon;
 
 class EstadoCuentaController extends Controller

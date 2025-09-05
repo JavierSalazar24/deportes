@@ -20,6 +20,7 @@ class PermisoDinamicoMiddleware
         // Mapa de rutas auxiliares a módulos reales
         $mapAliasModulo = [
             'generar-estadocuenta-banco'       => 'estadocuenta-bancos',
+            'generar-estadocuenta-jugador'     => 'estadocuenta-jugadores',
             'generar-estadocuenta-proveedor'   => 'estadocuenta-proveedores',
             'articulos-asignar'                => 'articulos',
             'almacen-disponibles'              => 'almacen',

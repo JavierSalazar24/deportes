@@ -17,6 +17,7 @@ use App\Http\Controllers\EquipamientoController;
 |
 */
 
+Route::get('/api/pdf/estado-cuenta-jugadores', [EstadoCuentaController::class, 'generarPdfEstadoCuentaJugador']);
 Route::get('/api/pdf/estado-cuenta-proveedores', [EstadoCuentaController::class, 'generarPdfEstadoCuentaProveedor']);
 Route::get('/api/pdf/estado-cuenta-bancos', [EstadoCuentaController::class, 'generarPdfEstadoCuentaBanco']);
 Route::get('/api/pdf/equipamiento/{id}', [EquipamientoController::class, 'equipamientoPDF']);
