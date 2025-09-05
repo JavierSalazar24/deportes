@@ -26,21 +26,11 @@ class BancoController extends Controller
             'saldo_inicial' => 'required|numeric|min:0'
         ]);
 
+        $data['saldo'] = $data['saldo_inicial'];
+
         DB::beginTransaction();
         try {
             $registro = Banco::create($data);
-
-            MovimientoBancario::create([
-                'banco_id'        => $registro->id,
-                'tipo_movimiento' => 'Ingreso',
-                'concepto'        => 'Saldo inicial',
-                'fecha'           => now()->format('Y-m-d'),
-                'referencia'      => null,
-                'monto'           => $data['saldo_inicial'],
-                'metodo_pago'     => 'Efectivo',
-                'origen_id'       => null,
-                'origen_type'     => null,
-            ]);
 
             DB::commit();
             return response()->json(['message' => 'Registro guardado'], 201);
@@ -76,6 +66,8 @@ class BancoController extends Controller
             'nombre' => 'sometimes|string|max:50',
             'cuenta' => 'sometimes|string|max:50',
             'clabe' => 'sometimes|string|max:50',
+            'saldo_inicial' => 'sometimes|numeric|min:0',
+            'saldo' => 'sometimes|numeric|min:0'
         ]);
 
         $registro->update($data);

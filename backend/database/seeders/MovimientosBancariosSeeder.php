@@ -28,29 +28,8 @@ class MovimientosBancariosSeeder extends Seeder
 
     public function run(): void
     {
-        /** ------------------------------------------------------------------
-         * 1. SALDO INICIAL POR CADA BANCO (si no existe)
-         * ----------------------------------------------------------------- */
-        Banco::all()->each(function ($banco) {
-            MovimientoBancario::firstOrCreate(
-                [
-                    'banco_id'   => $banco->id,
-                    'concepto'   => 'Saldo inicial',
-                    'origen_id'  => null,
-                    'origen_type'=> null,
-                ],
-                [
-                    'tipo_movimiento' => 'Ingreso',
-                    'fecha'           => now()->toDateString(),
-                    'monto'           => $banco->saldo_inicial ?? 10_000,
-                    'metodo_pago'     => 'Efectivo',
-                    'referencia'      => null,
-                ]
-            );
-        });
-
         /*───────────────────────────────────────────────────────────────────
-         | 2. INGRESOS  →  PAGOS DE JUGADORES  (estatus Pagado)
+         | 1. INGRESOS  →  PAGOS DE JUGADORES  (estatus Pagado)
          ───────────────────────────────────────────────────────────────────*/
         PagoJugador::with(['banco', 'deuda_jugador'])
             ->chunk(200, function ($pagos) {
@@ -76,7 +55,7 @@ class MovimientosBancariosSeeder extends Seeder
         });
 
         /** ------------------------------------------------------------------
-         * 3. INGRESOS  →  ABONOS DE PAGOS (parciales)
+         * 2. INGRESOS  →  ABONOS DE PAGOS (parciales)
          * ----------------------------------------------------------------- */
         AbonoDeudaJugador::with(['banco', 'deuda_jugador'])->chunk(200, function ($abonos) {
             foreach ($abonos as $abono) {
@@ -124,7 +103,7 @@ class MovimientosBancariosSeeder extends Seeder
         });
 
         /** ------------------------------------------------------------------
-         * 5. EGRESOS  →  COMPRAS  (ligadas a OC pagada)
+         * 3. EGRESOS  →  COMPRAS  (ligadas a OC pagada)
          * ----------------------------------------------------------------- */
         Compra::with('orden_compra.banco')
             ->chunk(200, function ($compras) {

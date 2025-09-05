@@ -26,7 +26,7 @@ export const FormBancos = ({ view, edit, formData, handleInputChange }) => {
           required={required}
           value={formData[name] || ''}
           onChange={handleInputChange}
-          disabled={name === 'saldo' ? true : view}
+          disabled={view}
           classInput='md:col-span-2'
         />
       ))}

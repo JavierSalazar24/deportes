@@ -79,10 +79,6 @@ class CategoriaController extends Controller
             return response()->json(['error' => 'Registro no encontrado'], 404);
         }
 
-        if(Categoria::where('temporada_id',$data['temporada_id'])->where('nombre',$data['nombre'])->exists()){
-            return response()->json(['message' => 'Registro duplicado'],422);
-        }
-
         $data = $request->validate([
             'temporada_id' => 'sometimes|exists:temporadas,id',
             'nombre' => 'sometimes|string',
@@ -91,8 +87,29 @@ class CategoriaController extends Controller
             'fecha_fin' => 'sometimes|date',
         ]);
 
-        $registro->update($data);
-        return response()->json(['message' => 'Registro actualizado'], 201);
+        $temporadaId = $data['temporada_id'] ?? $registro->temporada_id;
+        $nombre      = $data['nombre']       ?? $registro->nombre;
+
+        $duplicado = Categoria::where('temporada_id', $temporadaId)
+        ->where('nombre', $nombre)
+        ->where('id', '!=', $registro->id)
+        ->exists();
+
+        if ($duplicado) {
+            return response()->json(['message' => 'Registro duplicado'], 422);
+        }
+
+        try {
+            $registro->update($data);
+        } catch (QueryException $e) {
+            // 23000 = violación de restricción (índice único)
+            if ($e->getCode() === '23000') {
+                return response()->json(['message' => 'Registro duplicado'], 422);
+            }
+            return response()->json(['message' => 'Ha ocurrido un error'], 422);
+        }
+
+        return response()->json(['message' => 'Registro actualizado'], 200);
     }
 
     //  * Eliminar un registro.
