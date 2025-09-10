@@ -10,7 +10,8 @@ use App\Models\{
     AbonoDeudaJugador,
     Partido,
     Categoria,
-    Banner
+    Banner,
+    CostoCategoria
 };
 use App\Helpers\ArchivosHelper;
 use Carbon\CarbonImmutable;
@@ -162,7 +163,7 @@ class TutorController extends Controller
             ->first();
 
         if(!$categoria){
-            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifique sus datos'], 422);
+            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifiquelos'], 422);
         }
 
         $data['categoria_id'] = $categoria->id;
@@ -294,10 +295,10 @@ class TutorController extends Controller
             ->where('genero', $request->genero)
             ->whereDate('fecha_inicio', '<=', $request->fecha_nacimiento)
             ->whereDate('fecha_fin',   '>=', $request->fecha_nacimiento)
-            ->firstOrFail();
+            ->first();
 
         if(!$categoriaNueva){
-            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifique sus datos'], 422);
+            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifiquelos'], 422);
         }
 
         $tempAntId       = $categoriaAnt->temporada_id;
