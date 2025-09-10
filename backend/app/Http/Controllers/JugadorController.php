@@ -113,10 +113,14 @@ class JugadorController extends Controller
             $data['firma'] = $this->subirDocumento($request->file('firma'));
         }
 
-         $categoria = Categoria::where('temporada_id', $request->temporada_id)->where('genero', $request->genero)
+        $categoria = Categoria::where('temporada_id', $request->temporada_id)->where('genero', $request->genero)
             ->whereDate('fecha_inicio', '<=', $request->fecha_nacimiento)
             ->whereDate('fecha_fin', '>=', $request->fecha_nacimiento)
             ->first();
+
+        if(!$categoria){
+            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifique sus datos'], 422);
+        }
 
         $data['categoria_id'] = $categoria->id;
 
@@ -258,6 +262,10 @@ class JugadorController extends Controller
             ->whereDate('fecha_inicio', '<=', $request->fecha_nacimiento)
             ->whereDate('fecha_fin',   '>=', $request->fecha_nacimiento)
             ->firstOrFail();
+
+        if(!$categoriaNueva){
+            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifique sus datos'], 422);
+        }
 
         $categoriaAnt    = $jugador->categoria;
         $tempAntId       = $categoriaAnt->temporada_id;
