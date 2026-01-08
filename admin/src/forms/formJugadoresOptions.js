@@ -60,7 +60,7 @@ export const formOptions = {
     {
       required: true,
       type: 'number',
-      label: 'Teléfono del tutor *',
+      label: 'Celular del tutor *',
       name: 'telefono_tutor'
     },
     {

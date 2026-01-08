@@ -16,7 +16,7 @@ export const SearchBar = ({
   openModal
 }) => {
   const { user } = useAuth()
-  const { generateReportCartera } = useReportes()
+  const { exportJugadores } = useReportes()
   const { search, pathname } = useLocation()
 
   const searchValue = () => {
@@ -67,10 +67,10 @@ export const SearchBar = ({
             </button>
           )}
 
-        {pathname === '/reporte-cartera-vencida' && (
+        {pathname === '/jugadores' && (
           <button
-            onClick={() => generateReportCartera(data)}
-            className='cursor-pointer flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#3674B5] hover:bg-[#285381] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#285381]'
+            onClick={() => exportJugadores(data)}
+            className='cursor-pointer flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-800'
           >
             <FileDown className='h-5 w-5 mr-2' />
             Exportar datos

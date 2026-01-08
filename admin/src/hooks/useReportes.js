@@ -378,6 +378,53 @@ export const useReportes = () => {
     }
   }
 
+  const exportJugadores = async (form) => {
+    const data = form.map((info) => ({
+      temporada: info.categoria.temporada.nombre,
+      categoria: info.categoria.nombre,
+      nombre: `${info.nombre} ${info.apellido_p} ${info.apellido_m}`,
+      genero: info.genero,
+      direccion: info.direccion,
+      telefono: info.telefono,
+      fecha_nacimiento: dayjs(info.fecha_nacimiento).format('DD/MM/YYYY'),
+      curp: info.curp,
+      padecimientos: info.padecimientos,
+      alergias: info.alergias,
+      tutor: info.usuario.nombre_completo,
+      telefono_tutor: info.usuario.telefono,
+      correo_tutor: info.usuario.email,
+      curp_pdf: info.curp_jugador_url,
+      acta_nacimiento_pdf: info.acta_nacimiento_url,
+      ine_responsable_pdf: info.ine_url,
+      comprobante_domicilio_pdf: info.comprobante_domicilio_url,
+      firma: info.firma_url
+    }))
+
+    const headers = [
+      'Temporada',
+      'Categoría',
+      'Nombre',
+      'Género',
+      'Dirección',
+      'Celular',
+      'Fecha de nacimiento',
+      'CURP',
+      'Padecimientos',
+      'Alergias',
+      'Padre/Madre/Tutor',
+      'Celular de padre/madre/tutor',
+      'Correo del tutor',
+      'CURP del jugador (PDF)',
+      'Acta de nacimiento del jugador (PDF)',
+      'INE del responsable (PDF)',
+      'Comprobante de domicilio (PDF)',
+      'Firma'
+    ]
+
+    const filename = `Jugadores ${dayjs().format('DD-MM-YYYY')}.xlsx`
+    exportToExcel(data, headers, 'Jugadores', filename)
+  }
+
   const generateEstadoCuentaProveedor = async (form) => {
     const data = await getEstadoCuentaProveedor(form)
     setEstado(data)
@@ -536,6 +583,7 @@ export const useReportes = () => {
     generateReport,
     generateEstadoCuentaProveedor,
     generateEstadoCuentaBanco,
-    generateEstadoCuentaJugadores
+    generateEstadoCuentaJugadores,
+    exportJugadores
   }
 }
