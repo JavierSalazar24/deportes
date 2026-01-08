@@ -17,7 +17,7 @@ export const LoginForm = () => {
     try {
       await login(data.email, data.password)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       toast.error('Credenciales inválidas')
     } finally {
       setLoading(false)

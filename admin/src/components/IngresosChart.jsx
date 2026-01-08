@@ -27,7 +27,13 @@ export const IngresosChart = ({ data = [] }) => {
             <XAxis dataKey='mes' />
             <YAxis />
             <Tooltip
-              formatter={(value) => `$${value.toLocaleString('es-MX')}`}
+              formatter={(value, name, props) => {
+                const { payload } = props
+                return [
+                  `$${value.toLocaleString('es-MX')}`,
+                  `Módulos: ${payload.modulos.join(', ') || 'Sin origen'}`
+                ]
+              }}
               labelFormatter={(label) => `Mes: ${label}`}
             />
             <Line

@@ -18,7 +18,7 @@ export default function LoginPage() {
           <div className='h-24 w-24 overflow-hidden rounded-full bg-primary/10'>
             <img
               src={logo}
-              alt='Logo del club potros'
+              alt='Logo del club'
               className='h-full w-full object-contain'
             />
           </div>

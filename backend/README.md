@@ -1,490 +1,195 @@
-# Toros Club - Backend API
+# Sistema de Gestión para Club Deportivo — Backend
 
-Bienvenido al backend de Toros Club, un sistema desarrollado en Laravel para gestionar el registro de jugadores, documentos, pagos, transferencias, etc., dentro del club. Este API proporciona un entorno seguro y eficiente para la administración de usuarios, roles y la información clave del sistema, entre otras.
-Este documento detalla los endpoints disponibles, los datos requeridos en cada petición y las reglas de validación aplicadas.
+**URL:** https://deportes.arcanix.com.mx/  
+**Credenciales demo:**
 
-## URL base
+-   Correo: `deportes@arcanix.com.mx`
+-   Contraseña: `arcanix`
 
-```
-https://sistema.clubtoros.com/api
-```
-
-## Autenticación
-
-La API está protegida mediante Laravel Sanctum, por lo que para acceder a los endpoints protegidos es necesario incluir un token Bearer en las peticiones.
-Cada solicitud debe cumplir con las validaciones establecidas, y en caso de errores en los datos, se devolverá una respuesta con código 422 indicando el problema específico.
-
-### **Login**
-
-**Endpoint:**
-
-```
-POST /login
-```
-
-**Requiere:**
-
-```json
-{
-    "correo": "email requerido",
-    "contrasena": "string requerido"
-}
-```
-
-**Errores:**
-
--   `401`: Credenciales incorrectas.
--   `422`: Datos inválidos o faltantes.
+> API + lógica de negocio para una aplicación multiusuario con roles y permisos. Genera PDFs, exporta Excel y centraliza la operación contable (deudas/abonos/pagos + bancos/movimientos).
 
 ---
 
-### **Pre Registro**
+## Tabla de contenido
 
-**Endpoint:**
-
-```
-POST /registro
-```
-
-**Requiere:**
-
-```json
-{
-    "nombre_completo": "string requerido, max: 255",
-    "celular": "string requerido, max: 15",
-    "ocupacion": "string requerido, max: 100",
-    "correo": "email requerido, único"
-}
-```
-
-**Errores:**
-
--   `422`: Datos inválidos o faltantes.
+-   [Resumen](#resumen)
+-   [Tecnologías](#tecnologías)
+-   [Dominio y reglas de negocio](#dominio-y-reglas-de-negocio)
+    -   [Temporadas](#temporadas)
+    -   [Categorías](#categorías)
+    -   [Conceptos de cobro y costos](#conceptos-de-cobro-y-costos)
+    -   [Deudas de jugadores](#deudas-de-jugadores)
+    -   [Pagos y abonos](#pagos-y-abonos)
+    -   [Bancos y movimientos](#bancos-y-movimientos)
+    -   [Proveedores, compras y almacén](#proveedores-compras-y-almacén)
+    -   [Partidos y calendario](#partidos-y-calendario)
+-   [Módulos principales](#módulos-principales)
+-   [Instalación y uso](#instalación-y-uso)
+-   [Migraciones y seeders](#migraciones-y-seeders)
+-   [Notas y buenas prácticas](#notas-y-buenas-prácticas)
+-   [Licencia](#licencia)
 
 ---
 
-### **Logout**
+## Resumen
 
-**Endpoint:**
+Backend (Laravel) para la administración integral de un club deportivo:
 
-```
-POST /logout
-```
-
-**Requiere:**
-
--   Token de autenticación en el header como `Bearer token`
-
----
-
-## **Rutas protegidas** (Requieren autenticación con `Bearer token`)
-
-### **Roles** (Solo para administradores)
-
-```
-GET /roles
-POST /roles
-GET /roles/{id}
-PUT /roles/{id}
-DELETE /roles/{id}
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "nombre": "string requerido, max: 100, único",
-    "permisos": "string requerido"
-}
-```
-
-**Requiere en PUT:**
-
-```json
-{
-    "nombre": "string opcional, max: 100, único",
-    "permisos": "string opcional"
-}
-```
+-   Registro de jugadores, **utilería/asignación de equipo** (con PDF firmado).
+-   **Temporadas** (inicio/fin, estatus: _Activa_ o _Finalizada_).
+-   **Categorías** por rango de edad y género.
+-   **Tipos de cobro** (dinámicos) con **periodicidad** (Diario, Semanal, Quincenal, Mensual, Bimestral, Trimestral, Cuatrimestral, Semestral, Anual, Temporada).
+-   **Costos por categoría** (dinámicos, independientes, con control de cambios).
+-   **Gestión de partidos** y **calendario**.
+-   **Gestión de pagos**: creación automática de **deudas** por jugador; **abonos** parciales; conciliación a través de **movimientos bancarios**.
+-   **Historial** completo de deudas, abonos y pagos de temporadas anteriores.
+-   **Proveedores, órdenes de compra y compras**, con **estado de cuenta** en PDF.
+-   **Artículos y almacén** (entradas/salidas), inventario y utilería asignada.
+-   **Gastos** y **bancos** con **movimientos** (ingresos/egresos), saldo inicial y actual; estados de cuenta (PDF).
+-   Exportaciones a **Excel**: movimientos bancarios, órdenes de compra, compras, gastos, almacén, equipo asignado, deudas, abonos y pagos.
 
 ---
 
-### **Usuarios**
+## Tecnologías
 
-```
-GET /usuarios
-POST /usuarios
-GET /usuarios/{id}
-PUT /usuarios/{id}
-DELETE /usuarios/{id} (Solo admin)
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "nombre_completo": "string requerido, max: 255",
-    "celular": "string requerido, max: 15",
-    "ocupacion": "string requerido, max: 100",
-    "correo": "email requerido, único",
-    "contrasena": "string requerido, min: 6",
-    "rol_id": "integer requerido, debe existir en roles"
-}
-```
-
-**Requiere en PUT:**
-
-```json
-{
-    "nombre_completo": "string opcional, max: 255",
-    "celular": "string opcional, max: 15",
-    "ocupacion": "string opcional, max: 100",
-    "correo": "email opcional, único",
-    "contrasena": "string opcional, min: 6"
-}
-```
+-   **Laravel (PHP)**
+-   **MariaDB / MySQL**
+-   **Autenticación/Autorización:** roles y permisos por usuario
+-   Generación de **PDF** y exportaciones **Excel** (según librerías instaladas en el proyecto)
 
 ---
 
-### **Perfil**
+## Dominio y reglas de negocio
 
+### Temporadas
+
+-   Campos: `nombre`, `fecha_inicio`, `fecha_fin`, `estatus` (_Activa_ | _Finalizada_).
+-   La **temporada Activa** determina qué deudas/pagos/abonos se muestran en los módulos “operativos”.
+-   El **historial** incluye temporadas _Finalizadas_ (y puede mostrar todas si se requiere).
+
+### Categorías
+
+-   Se parametrizan por **rango de edad** y **género**.
+-   Cada jugador pertenece a **una categoría** dentro de una temporada.
+
+### Conceptos de cobro y costos
+
+-   **Conceptos de cobro** (ej. Inscripción, Uniforme, Entrenamiento, Viaje) definen la **periodicidad**.
+-   **Costos por categoría** unen _Categoría_ + _Concepto_ con un `monto_base` independiente y versionable.
+-   Restricciones únicas (ej.: `unique` por `categoria_id` + `concepto_cobro_id`).
+
+### Deudas de jugadores
+
+-   Se generan **automáticamente al crear un jugador** según la **periodicidad** de cada costo de su categoría, **desde el día de alta** hasta el **fin de temporada**.
+-   **Regla de fechas:**
+    -   `fecha_pago = fecha_alta + 1 semana` **(si cruza de mes, usar último día del mes)**.
+    -   `fecha_limite = fecha_pago + 1 semana`.
+-   **No** se generan deudas retroactivas si el jugador entra a mitad de temporada.
+-   **Único por periodo:** `unique(jugador_id, costo_categoria_id, fecha_pago)`.
+-   Estados: `Pendiente | Parcial | Pagado | Cancelado`.
+-   Listados operativos: se muestran **solo las deudas** de la temporada _Activa_ con `estatus != Pagado`.  
+    El **historial** agrupa y ordena por temporada (típicamente por `t.fecha_inicio desc`, jugador y fecha de pago).
+
+### Pagos y abonos
+
+-   **PagoJugador** liquida una deuda (`Pagado`), y puede estar acompañado de **Abonos** (cuando hubo pagos parciales previos).
+-   **AbonoDeudaJugador** registra pagos parciales y se refleja en el `saldo_restante` y `estatus = Parcial`.
+-   Eliminación de pagos en temporadas **Finalizadas** limpia relaciones (abonos relacionados y sus movimientos bancarios) y borra el ticket de pago.
+-   En temporadas **Activas**, los pagos **no se eliminan** (regla de seguridad/contabilidad).
+
+### Bancos y movimientos
+
+-   **MovimientoBancario** (`Ingreso`/`Egreso`) con **morphMany** (`origen_type`, `origen_id`) para vincularse con pagos, abonos, gastos y compras.
+-   **BancoService** centraliza la creación/reversión de movimientos.
+    -   `registrarIngreso/registrarEgreso()` graban el movimiento (fecha, método, referencia) y permiten enlazar el origen.
+    -   `revertirMovimiento()` elimina el movimiento asociado.
+-   Seed de **saldo inicial** por banco mediante `MovimientoBancario`.
+
+### Proveedores, compras y almacén
+
+-   **Órdenes de compra** y **Compras** (pagadas) con vínculo a bancos/movimientos.
+-   **Estado de cuenta del proveedor** en PDF (rango de fechas, totales por estatus).
+-   **Artículos** y **Almacén** con entradas/salidas y **utilería** asignada a jugadores (PDF de entrega, costo por pérdida, firma).
+
+### Partidos y calendario
+
+-   Módulo de **partidos** (vinculados a categoría) y **calendario** para visualizarlos.
+-   **Calendario de pagos** (deudas): cada **evento** representa “un jugador en una fecha”, y al abrir se listan **todas sus deudas** de ese día (con estatus y abonos).
+
+---
+
+## Módulos principales
+
+-   **Jugadores** (alta/edición con documentos e imágenes).
+-   **Utilería** (asignación y PDF).
+-   **Temporadas / Categorías**.
+-   **Tipos de cobros** y **Costos por categoría**.
+-   **Deudas, Abonos, Pagos**, con **Historial** por temporadas finalizadas o **todas**.
+-   **Caja** (quién cobró).
+-   **Proveedores, Órdenes de compra, Compras** y **Estado de cuenta** (PDF).
+-   **Artículos y Almacén** (inventario, entradas/salidas).
+-   **Gastos**.
+-   **Bancos y Movimientos** (saldo inicial/actual, estado de cuenta PDF).
+-   **Reportes** en Excel (bancos, órdenes, compras, gastos, almacén, equipo, deudas, abonos, pagos).
+
+---
+
+## Instalación y uso
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
-GET /perfil
-PUT /perfil
+
+> Configura tu conexión a base de datos en `.env` antes de migrar.
+
+### Migraciones y seeders
+
+```bash
+php artisan migrate --seed
 ```
 
-**Requiere en PUT:**
+### Servidor local
 
-```json
-{
-    "nombre_completo": "string opcional, max: 255",
-    "celular": "string opcional, max: 15",
-    "ocupacion": "string opcional, max: 100",
-    "correo": "email opcional, único",
-    "contrasena": "string opcional, min: 6"
-}
+```bash
+php artisan serve
 ```
 
 ---
 
-### **Registro de Jugadores**
+## Migraciones y seeders
 
-```
-GET /registro-jugadores
-POST /registro-jugadores
-GET /registro-jugadores/{id}
-PUT /registro-jugadores/{id}
-DELETE /registro-jugadores/{id} (Solo admin)
-```
-
-**SI 'tipo_inscripcion' ES IGUAL A 'transferencia' requiere en POST:**
-
-```json
-{
-    "nombre": "string requerido, max: 20",
-    "apellido_p": "string requerido, max: 30",
-    "apellido_m": "string requerido, max: 30",
-    "sexo": "requerido, valores: hombre, mujer",
-    "direccion": "string requerido, max: 500",
-    "telefono": "string requerido, max: 15",
-    "fecha_nacimiento": "date requerido",
-    "lugar_nacimiento": "string requerido, max: 255",
-    "curp": "string requerido, tamaño: 18, único",
-    "grado_escolar": "requerido, valores: primaria, secundaria, preparatoria",
-    "nombre_escuela": "string requerido, max: 255",
-    "alergias": "string requerido, max: 500",
-    "padecimientos": "string requerido, max: 500",
-    "peso": "numeric requerido, min: 1, max: 500",
-    "tipo_inscripcion": "requerido, valores: novato, reinscripcion, transferencia, porrista",
-    "foto_jugador": "base64 requerido",
-
-    "club_anterior": "string requerido",
-    "temporadas_jugadas": "integer requerido, min: 1",
-    "motivo_transferencia": "string requerido"
-}
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "nombre": "string requerido, max: 20",
-    "apellido_p": "string requerido, max: 30",
-    "apellido_m": "string requerido, max: 30",
-    "sexo": "requerido, valores: hombre, mujer",
-    "direccion": "string requerido, max: 500",
-    "telefono": "string requerido, max: 15",
-    "fecha_nacimiento": "date requerido",
-    "lugar_nacimiento": "string requerido, max: 255",
-    "curp": "string requerido, tamaño: 18, único",
-    "grado_escolar": "requerido, valores: primaria, secundaria, preparatoria",
-    "nombre_escuela": "string requerido, max: 255",
-    "alergias": "string requerido, max: 500",
-    "padecimientos": "string requerido, max: 500",
-    "peso": "numeric requerido, min: 1, max: 500",
-    "tipo_inscripcion": "requerido, valores: novato, reinscripcion, transferencia, porrista",
-    "foto_jugador": "base64 requerido"
-    // "foto_jugador": "imagen requerido, formatos: jpg, jpeg, png, max: 2048 KB"
-}
-```
-
-**Requiere en PUT:**
-
-<!-- **IMPORTANTE:** Para actualizar la foto, envía la petición en `POST` usando `form-data` y agrega el campo `_method` con valor `PUT`. -->
-
-```json
-{
-    "nombre": "string opcional, max: 20",
-    "apellido_p": "string opcional, max: 30",
-    "apellido_m": "string opcional, max: 30",
-    "sexo": "opcional, valores: hombre, mujer",
-    "direccion": "string opcional, max: 500",
-    "telefono": "string opcional, max: 15",
-    "fecha_nacimiento": "date opcional",
-    "lugar_nacimiento": "string opcional, max: 255",
-    "curp": "string opcional, tamaño: 18, único",
-    "grado_escolar": "opcional, valores: primaria, secundaria, preparatoria",
-    "nombre_escuela": "string opcional, max: 255",
-    "alergias": "string opcional, max: 500",
-    "padecimientos": "string opcional, max: 500",
-    "peso": "numeric opcional, min: 1, max: 500",
-    "tipo_inscripcion": "opcional, valores: novato, reinscripcion, transferencia, porrista",
-    "foto_jugador": "base64 opcional"
-    // "foto_jugador": "imagen opcional, formatos: jpg, jpeg, png, max: 2048 KB"
-}
-```
+-   Incluye seeders para datos iniciales (catálogos, roles/permisos y saldos iniciales por banco según configuración del proyecto).
+-   Al correr `--seed`, se recomienda hacerlo sobre un entorno limpio (o controlado) para evitar duplicados, especialmente en catálogos con restricciones `unique`.
 
 ---
 
-### **Actualizar Número MFL de Jugadores**
+## Notas y buenas prácticas
 
-```
-PATCH /actualizar-mfl/{id}
-```
-
-**Requiere en PATCH:**
-
-```json
-{
-    "numero_mfl": "string requerido, min: 7, max: 8"
-}
-```
-
----
-
-### **Busqueda a Jugadores por CURP**
-
-```
-GET /search-jugadores?curp={curp}
-```
+-   Contabilidad y trazabilidad:
+    -   Mantén las operaciones sensibles (pagos/abonos/gastos/compras) pasando por un servicio (ej. `BancoService`) para centralizar alta/reversión de movimientos.
+-   Integridad:
+    -   Define índices `unique` (jugador + costo + fecha) y FK para evitar inconsistencias.
+-   Temporadas:
+    -   Asegura que siempre exista a lo sumo **una** temporada “Activa” si tu lógica lo requiere.
+-   PDFs y exports:
+    -   Valida storage y permisos de escritura en servidores (por ejemplo `storage/` y `bootstrap/cache`).
+-   Seguridad:
+    -   En temporadas activas, evitar borrados de pagos por regla de auditoría/contabilidad.
 
 ---
 
-### **Registro de Porristas**
+## Licencia
 
-```
-GET /registro-porristas
-POST /registro-porristas
-GET /registro-porristas/{id}
-PUT /registro-porristas/{id}
-DELETE /registro-porristas/{id} (Solo admin)
-```
+Este software puede ser licenciado por cliente con **código fuente completo**.  
+El cliente es responsable del hosting, datos y uso del sistema.
 
-**Requiere en POST:**
-
-```json
-{
-    "nombre": "string requerido, max: 20",
-    "apellido_p": "string requerido, max: 30",
-    "apellido_m": "string requerido, max: 30",
-    "sexo": "requerido, valores: hombre, mujer",
-    "direccion": "string requerido, max: 500",
-    "telefono": "string requerido, max: 15",
-    "fecha_nacimiento": "date requerido",
-    "lugar_nacimiento": "string requerido, max: 255",
-    "curp": "string requerido, tamaño: 18, único",
-    "grado_escolar": "requerido, valores: primaria, secundaria, preparatoria",
-    "nombre_escuela": "string requerido, max: 255",
-    "alergias": "string requerido, max: 500",
-    "padecimientos": "string requerido, max: 500",
-    "peso": "numeric requerido, min: 1, max: 500",
-    "tipo_inscripcion": "requerido, valores: novato, reinscripcion, transferencia, porrista",
-    "foto_porrista": "base64 requerido"
-    // "foto_porrista": "imagen requerido, formatos: jpg, jpeg, png, max: 2048 KB"
-}
-```
-
-**Requiere en PUT:**
-
-<!-- **IMPORTANTE:** Para actualizar la foto, envía la petición en `POST` usando `form-data` y agrega el campo `_method` con valor `PUT`. -->
-
-```json
-{
-    "nombre": "string opcional, max: 20",
-    "apellido_p": "string opcional, max: 30",
-    "apellido_m": "string opcional, max: 30",
-    "sexo": "opcional, valores: hombre, mujer",
-    "direccion": "string opcional, max: 500",
-    "telefono": "string opcional, max: 15",
-    "fecha_nacimiento": "date opcional",
-    "lugar_nacimiento": "string opcional, max: 255",
-    "curp": "string opcional, tamaño: 18, único",
-    "grado_escolar": "opcional, valores: primaria, secundaria, preparatoria",
-    "nombre_escuela": "string opcional, max: 255",
-    "alergias": "string opcional, max: 500",
-    "padecimientos": "string opcional, max: 500",
-    "peso": "numeric opcional, min: 1, max: 500",
-    "tipo_inscripcion": "opcional, valores: novato, reinscripcion, transferencia, porrista",
-    "foto_porrista": "base64 opcional"
-    // "foto_porrista": "imagen opcional, formatos: jpg, jpeg, png, max: 2048 KB"
-}
-```
+Para más información o personalizaciones, contacta a: contacto@arcanix.com.mx
 
 ---
 
-### **Documentos del jugador**
+## Autor
 
-```
-GET /documentos
-POST /documentos
-GET /documentos/{id}
-POST /documentos/{id}
-DELETE /documentos/{id} (Solo admin)
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "registro_jugador_id": "integer requerido, único",
-    "curp_jugador": "archivo PDF requerido, max: 2048 KB",
-    "ine_tutor": "archivo PDF requerido, max: 2048 KB",
-    "acta_nacimiento": "archivo PDF requerido, max: 2048 KB",
-    "comprobante_domicilio": "archivo PDF requerido, max: 2048 KB"
-}
-```
-
-**Requiere en PUT:**
-
-**IMPORTANTE:** Para actualizar documentos, envía la petición en `POST` usando `form-data` y agrega el campo `_method` con valor `PUT`.
-
-```json
-{
-    "curp_jugador": "archivo PDF opcional, max: 2048 KB",
-    "ine_tutor": "archivo PDF opcional, max: 2048 KB",
-    "acta_nacimiento": "archivo PDF opcional, max: 2048 KB",
-    "comprobante_domicilio": "archivo PDF opcional, max: 2048 KB"
-}
-```
-
----
-
-### **Transferencia de jugadores**
-
-```
-GET /transferencia-jugadores
-POST /transferencia-jugadores
-GET /transferencia-jugadores/{id}
-PUT /transferencia-jugadores/{id}
-DELETE /transferencia-jugadores/{id} (Solo admin)
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "club_anterior": "string requerido",
-    "temporadas_jugadas": "integer requerido, min: 1",
-    "motivo_transferencia": "string requerido",
-    "registro_jugador_id": "integer requerido, único"
-}
-```
-
-**Requiere en PUT:**
-
-```json
-{
-    "club_anterior": "string opcional",
-    "temporadas_jugadas": "integer opcional, min: 1",
-    "motivo_transferencia": "string opcional"
-}
-```
-
----
-
-### **Pagos NTR (jugadores)**
-
-```
-GET /pagos-ntr
-POST /pagos-ntr
-GET /pagos-ntr/{id}
-PUT /pagos-ntr/{id}
-DELETE /pagos-ntr/{id} (Solo admin)
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "inscripcion": "boolean requerido",
-    "tunel": "boolean requerido",
-    "botiquin": "boolean requerido",
-    "coacheo_semanal": "boolean requerido",
-    "registro_jugador_id": "integer requerido, único"
-}
-```
-
-**Requiere en PUT:**
-
-```json
-{
-    "inscripcion": "boolean opcional",
-    "tunel": "boolean opcional",
-    "botiquin": "boolean opcional",
-    "coacheo_semanal": "boolean opcional",
-    "registro_jugador_id": "integer opcional, único"
-}
-```
-
----
-
-### **Pagos Porristas**
-
-```
-GET /pagos-porristas
-POST /pagos-porristas
-GET /pagos-porristas/{id}
-PUT /pagos-porristas/{id}
-DELETE /pagos-porristas/{id} (Solo admin)
-```
-
-**Requiere en POST:**
-
-```json
-{
-    "inscripcion": "boolean requerido",
-    "coacheo_semanal": "boolean requerido",
-    "registro_porrista_id": "integer requerido, único"
-}
-```
-
-**Requiere en PUT:**
-
-```json
-{
-    "inscripcion": "boolean opcional",
-    "coacheo_semanal": "boolean opcional",
-    "registro_porrista_id": "integer opcional, único"
-}
-```
-
----
-
-### **Notas**
-
--   Todos los endpoints dentro de `Route::middleware('auth:sanctum')` requieren un token en el header `Authorization: Bearer {token}`.
--   Los administradores son los únicos que pueden eliminar registros en todas las entidades.
--   En `documentos`, `transferencia-jugadores` y `pagos-ntr`, el `registro_jugador_id` es único.
--   Para actualizar documentos e imágenes en Laravel con PUT, se debe enviar `_method=PUT` en un request POST.
-
----
+Desarrollado por **Arcanix**.  
+Soporte técnico o consultas: contacto@arcanix.com.mx — ARCANIX WEB: https://arcanix.com.mx/

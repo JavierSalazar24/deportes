@@ -8,6 +8,8 @@
 
 > Aplicación multiusuario con roles y permisos. Es **instalable** como PWA (app de escritorio y móvil) y se comporta como aplicación nativa cuando se “agrega a la pantalla de inicio” o se instala en el navegador.
 
+Sistema web completo para la gestión operativa, administrativa y financiera de clubes deportivos. Desarrollado en Laravel (backend), React (frontend) y MySQL (base de datos).
+
 ---
 
 ## Tabla de contenido
@@ -140,3 +142,69 @@ Sistema integral para la administración de un club deportivo:
 
 - **Excel:** movimientos bancarios, órdenes de compra, compras, gastos, almacén, equipo asignado, deudas, abonos, pagos.
 - **PDF:** Utilería (entrega de equipo), Estado de cuenta de **Bancos**, Estado de cuenta de **Proveedores**.
+
+---
+
+## 🚀 Instalación y uso (FrontEnd)
+
+1. Instala dependencias:
+
+```bash
+npm install
+```
+
+2. Ejecuta en desarrollo:
+
+```bash
+npm run dev
+```
+
+3. Build de producción:
+
+```bash
+npm run build
+```
+
+4. Preview local del build:
+
+```bash
+npm run preview
+```
+
+---
+
+## 🚀 Instalación y uso (Backend)
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Para añadir migraciones y seeds:
+
+```bash
+php artisan migrate --seed
+```
+
+Para correr en local:
+
+```bash
+php artisan serve
+```
+
+---
+
+## Licencia
+
+Este software puede ser licenciado por cliente con **código fuente completo**.  
+El cliente es responsable del hosting, datos y uso del sistema.
+
+Para más información o personalizaciones, contacta a: contacto@arcanix.com.mx
+
+---
+
+## Autor
+
+Desarrollado por **Arcanix**.  
+Soporte técnico o consultas: contacto@arcanix.com.mx — ARCANIX WEB: https://arcanix.com.mx/

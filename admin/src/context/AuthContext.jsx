@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, logoutRequest, getUserProfile } from '../api/auth'
 import { useNavigate } from 'react-router'
@@ -27,8 +26,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = async () => {
-    const response = await logoutRequest()
-    console.log(response)
+    await logoutRequest()
 
     localStorage.removeItem('token')
     setUser(null)
