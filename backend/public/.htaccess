@@ -1,3 +1,39 @@
+# =========================
+# Bloqueo de archivos sensibles
+# =========================
+<IfModule mod_authz_core.c>
+  <FilesMatch "^\.(env|htaccess|git|svn)">
+    Require all denied
+  </FilesMatch>
+
+  <FilesMatch "(composer\.(json|lock)|package\.json|pnpm-lock\.yaml|yarn\.lock|vite\.config\.(js|ts)|webpack\.mix\.js|phpunit\.xml|artisan|server\.php)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+# Fallback para Apache viejo (2.2)
+<IfModule !mod_authz_core.c>
+  <FilesMatch "^\.(env|htaccess|git|svn)">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+
+  <FilesMatch "(composer\.(json|lock)|package\.json|pnpm-lock\.yaml|yarn\.lock|vite\.config\.(js|ts)|webpack\.mix\.js|phpunit\.xml|artisan|server\.php)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# Bloqueo explícito por si alguien intenta /.env (ANTES del front controller)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^\.env - [F,L]
+</IfModule>
+
+
+# =========================
+# Reescritura de URLs y manejo de caché
+# =========================
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
