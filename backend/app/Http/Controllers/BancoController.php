@@ -66,8 +66,6 @@ class BancoController extends Controller
             'nombre' => 'sometimes|string|max:50',
             'cuenta' => 'sometimes|string|max:50',
             'clabe' => 'sometimes|string|max:50',
-            'saldo_inicial' => 'sometimes|numeric|min:0',
-            'saldo' => 'sometimes|numeric|min:0'
         ]);
 
         $registro->update($data);

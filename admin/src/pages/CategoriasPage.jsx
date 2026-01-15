@@ -9,8 +9,8 @@ import { useModal } from '../hooks/useModal'
 const columns = [
   { key: 'nombre_temporada', name: 'Temporada' },
   { key: 'nombre', name: 'Categoría' },
-  { key: 'fecha_inicio_format', name: 'Fecha de nacimiento mínima' },
-  { key: 'fecha_fin_format', name: 'Fecha de nacimiento máxima' },
+  { key: 'rango', name: 'Edad' },
+  { key: 'nacidos', name: 'Nacidos entre' },
   { key: 'genero', name: 'Género' }
 ]
 

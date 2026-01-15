@@ -34,12 +34,10 @@ export const useModal = () => {
   const deleteModal = modalType === 'delete'
   const document = view || edit
 
-  const {
-    recalcularTotales,
-    calcularJugadoresTotal,
-    calcularTotalGastosCompras,
-    actualizarTotal
-  } = useCalculosTotales({ formData, setFormData })
+  const { calcularTotalGastosCompras, actualizarTotal } = useCalculosTotales({
+    formData,
+    setFormData
+  })
 
   const handleInputChange = async (e, actionMeta) => {
     let name, value
@@ -63,6 +61,8 @@ export const useModal = () => {
       const genero = name === 'genero' ? value : formData.genero
 
       if (temporada && fecha_nacimiento && genero) {
+        setCategorias([{ label: 'Buscando...', value: '' }])
+
         const data = await getFiltroCategoria({
           temporada,
           fecha_nacimiento,
@@ -87,8 +87,6 @@ export const useModal = () => {
       costosConcepto,
       setCostosConcepto,
       // Helpers de los forms
-      recalcularTotales,
-      calcularJugadoresTotal,
       actualizarTotal,
       calcularTotalGastosCompras,
       setReloadJugadores,
@@ -181,6 +179,13 @@ export const useModal = () => {
       setCostosConcepto([formData.costo_categoria_id])
     }
   }, [formData, view, edit, pathname])
+
+  useEffect(() => {
+    if (add && pathname === '/jugadores') {
+      setCategorias([{ label: 'Selecciona una opción', value: '' }])
+      setFormData('categoria', '')
+    }
+  }, [add, pathname, setFormData])
 
   return {
     view,

@@ -10,13 +10,13 @@ export const formOptions = {
     {
       required: true,
       type: 'date',
-      label: 'Fecha de nacimiento mínima *',
+      label: 'Nacimiento desde *',
       name: 'fecha_inicio'
     },
     {
       required: true,
       type: 'date',
-      label: 'Fecha de nacimiento máxima *',
+      label: 'Nacimiento hasta *',
       name: 'fecha_fin'
     },
     {

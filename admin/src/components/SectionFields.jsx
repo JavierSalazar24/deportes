@@ -1,5 +1,3 @@
-// src/components/forms/SectionFields.jsx
-
 import { AlertaCard } from './AlertaCard'
 import { InputField } from './InputField'
 

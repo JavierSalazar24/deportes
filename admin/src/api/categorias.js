@@ -25,8 +25,13 @@ export const getCategoria = async () => {
         value: categoria.temporada.id
       },
       nombre_temporada: categoria.temporada.nombre,
-      fecha_inicio_format: dayjs(categoria.fecha_inicio).format('DD/MM/YYYY'),
-      fecha_fin_format: dayjs(categoria.fecha_fin).format('DD/MM/YYYY')
+      nacidos: `${dayjs(categoria.fecha_inicio).format('DD/MM/YYYY')} - ${dayjs(
+        categoria.fecha_fin
+      ).format('DD/MM/YYYY')}`,
+      rango: `${dayjs().diff(categoria.fecha_fin, 'year')}-${dayjs().diff(
+        categoria.fecha_inicio,
+        'year'
+      )} años`
     }))
   } catch (error) {
     console.error('Error al obetener el registro', error)

@@ -88,8 +88,7 @@ export const useUsuarios = () => {
 
     const newData = {
       ...formData,
-      rol_id: formData.rol_id.value,
-      supervisor_id: formData?.supervisor_id?.value || null
+      rol_id: formData.rol_id.value
     }
 
     if (modalType === 'add') {

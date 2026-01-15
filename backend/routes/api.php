@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\CountPageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthTutorController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\JugadorController;
 use App\Http\Controllers\BancoController;
@@ -50,6 +51,7 @@ use App\Http\Controllers\TutorController;
 
 // Login y registro
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login-tutor', [AuthTutorController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 

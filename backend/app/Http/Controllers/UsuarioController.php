@@ -6,8 +6,9 @@ use App\Helpers\ArchivosHelper;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Mail\RegistroMailable;
+use App\Mail\RegistroTutorMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
@@ -34,9 +35,24 @@ class UsuarioController extends Controller
             $data['foto'] = $this->subirFoto($request->file('foto'));
         }
 
-        $registro = Usuario::create($data);
+        try {
+            DB::transaction(function () use ($data) {
+                $registro = Usuario::create($data);
 
-        return response()->json(['message' => 'Registro guardado'], 201);
+                if($registro->rol->id === 2){
+                    Mail::to($registro->email)->send(new RegistroTutorMail($registro, $data['password']));
+
+                    return response()->json(['message' => 'Registro guardado e email enviado'], 201);
+                }
+
+                return response()->json(['message' => 'Registro guardado'], 201);
+            });
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al crear el registro (no se guardó y no se envió correo).',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 
     //  * Mostrar un solo registro por su ID.
@@ -99,9 +115,6 @@ class UsuarioController extends Controller
             $this->eliminarFoto($usuario->foto);
         }
 
-        if($usuario->rol_id === 2){
-            return response()->json(['message' => 'No se puede eliminar un usuario con rol de "Tutor"'], 403);
-        }
         $usuario->delete();
 
         // Si la carpeta está vacía, la eliminamos para evitar directorios innecesarios

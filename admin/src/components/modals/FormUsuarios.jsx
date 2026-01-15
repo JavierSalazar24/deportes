@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { formOptions } from '../../forms/formUsuariosOptions'
 import { InputField } from '../InputField'
 
@@ -11,6 +12,21 @@ export const FormUsuarios = ({
   loadOptionsRoles,
   handleCheckboxChange
 }) => {
+  const [tutor, setTutor] = useState(false)
+
+  useEffect(() => {
+    if (formData?.rol_id?.value === 2) {
+      setTutor(true)
+      const generatedPassword = Math.random().toString().slice(-6)
+      handleInputChange({
+        target: { name: 'password', value: generatedPassword }
+      })
+    } else {
+      setTutor(false)
+      handleInputChange({ target: { name: 'password', value: '' } })
+    }
+  }, [formData?.rol_id?.value])
+
   return (
     <div className='grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6 md:grid-cols-2 mb-7'>
       {formOptions.generalFields.map(
@@ -24,27 +40,23 @@ export const FormUsuarios = ({
             value={formData[name] || ''}
             onChange={name === 'foto' ? handleFileChange : handleInputChange}
             accept={accept}
-            disabled={
-              formData.supervisor && ['nombre_completo', 'email'].includes(name)
-                ? true
-                : view
-            }
+            disabled={view}
             loadOptions={loadOptionsRoles}
-            classInput='md:col-span-2'
+            classInput={edit ? 'md:col-span-1' : 'md:col-span-1'}
           />
         )
       )}
 
       {add && (
         <InputField
-          type='password'
+          type={tutor ? 'text' : 'password'}
           label='Contraseña *'
           name='password'
           required={true}
           value={formData.password || ''}
           onChange={handleInputChange}
-          disabled={formData.supervisor ? true : view}
-          classInput='md:col-span-2'
+          disabled={view}
+          classInput='md:col-span-1'
         />
       )}
 
@@ -66,7 +78,7 @@ export const FormUsuarios = ({
 
           {formData.cambiar_pass && (
             <InputField
-              type='password'
+              type={tutor ? 'text' : 'password'}
               label='Contraseña'
               name='password'
               required={true}

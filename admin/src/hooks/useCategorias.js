@@ -63,6 +63,18 @@ export const useCategorias = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (formData.fecha_inicio && formData.fecha_fin) {
+      const fechaInicio = new Date(formData.fecha_inicio)
+      const fechaFin = new Date(formData.fecha_fin)
+      if (fechaInicio >= fechaFin) {
+        toast.error(
+          'La fecha de nacimiento desde debe ser menor a la fecha de nacimiento hasta.'
+        )
+        return
+      }
+    }
+
     Swal.fire({
       title:
         '<h2 style="font-family: "sans-serif";">Guardando registro, por favor espere...</h2>',

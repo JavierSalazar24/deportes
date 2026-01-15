@@ -163,7 +163,7 @@ class TutorController extends Controller
             ->first();
 
         if(!$categoria){
-            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifiquelos'], 422);
+            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifíquelos (Nacimiento y/o Genéro)'], 422);
         }
 
         $data['categoria_id'] = $categoria->id;
@@ -298,7 +298,7 @@ class TutorController extends Controller
             ->first();
 
         if(!$categoriaNueva){
-            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifiquelos'], 422);
+            return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifíquelos (Nacimiento y/o Genéro)'], 422);
         }
 
         $tempAntId       = $categoriaAnt->temporada_id;

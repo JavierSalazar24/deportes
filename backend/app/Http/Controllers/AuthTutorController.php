@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 
-class AuthController extends Controller
+class AuthTutorController extends Controller
 {
     // Login
     public function login(Request $request)
@@ -23,16 +23,12 @@ class AuthController extends Controller
             return response()->json(['message' => 'Credenciales inválidas'], 401);
         }
 
-        if ($usuario->rol_id == 2) {
-            return response()->json(['message' => 'Acceso denegado para tutores'], 403);
-        }
-
         $token = $usuario->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login exitoso',
             'token' => $token,
-            'usuario' => $usuario->load('rol.permisos.modulo') // Opcional: cargar rol con permisos
+            'usuario' => $usuario->load('rol.permisos.modulo')
         ]);
     }
 

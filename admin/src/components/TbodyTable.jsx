@@ -31,12 +31,20 @@ export const TbodyTable = ({
                         item.foto_url ? 'justify-start' : 'justify-center'
                       }`}
                     >
-                      {item.foto_url && (
+                      {pathname === '/banners' ? (
                         <img
                           src={item.foto_url}
-                          alt='Foto'
-                          className='w-10 h-10 rounded-full'
+                          alt={item.nombre}
+                          className='w-32 h-12 rounded-xl object-contain'
                         />
+                      ) : (
+                        item.foto_url && (
+                          <img
+                            src={item.foto_url}
+                            alt='Foto'
+                            className='w-10 h-10 rounded-full'
+                          />
+                        )
                       )}
 
                       <p className='text-sm text-gray-900'>

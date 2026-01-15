@@ -1,4 +1,4 @@
-import { toFloat, toInt } from '../utils/numbers'
+import { toFloat } from '../utils/numbers'
 
 export const useCalculosTotales = ({ formData, setFormData }) => {
   const aplicarImpuesto = (totalBase, costoExtra, porcentaje) => {
@@ -26,56 +26,6 @@ export const useCalculosTotales = ({ formData, setFormData }) => {
     setFormData('total', total.toFixed(2))
   }
 
-  const calcularJugadoresTotal = (dia, noche) =>
-    (toInt(dia) || 0) + (toInt(noche) || 0)
-
-  const calcularPrecioJugadoresDiaTotal = (precio, cantidad) =>
-    (toFloat(precio) || 0) * (toInt(cantidad) || 0)
-
-  const calcularSubtotalJugadores = ({
-    totalDia,
-    totalNoche,
-    precioJefe,
-    precioSupervisor
-  }) =>
-    (toFloat(totalDia) || 0) +
-    (toFloat(totalNoche) || 0) +
-    (toFloat(precioJefe) || 0) +
-    (toFloat(precioSupervisor) || 0)
-
-  const recalcularTotales = ({
-    precioDia = formData.precio_jugadores_dia,
-    precioNoche = formData.precio_jugadores_noche,
-    jugadoresDia = formData.jugadores_dia,
-    jugadoresNoche = formData.jugadores_noche,
-    precioJefe = formData.precio_jefe_turno,
-    precioSupervisor = formData.precio_supervisor,
-    descuentoPor = formData.descuento_porcentaje,
-    costoExtra = formData.costo_extra,
-    precioTotalServicios = formData.precio_total_servicios
-  } = {}) => {
-    const totalDia = calcularPrecioJugadoresDiaTotal(precioDia, jugadoresDia)
-    const totalNoche = calcularPrecioJugadoresDiaTotal(
-      precioNoche,
-      jugadoresNoche
-    )
-
-    setFormData('precio_jugadores_dia_total', totalDia)
-    setFormData('precio_jugadores_noche_total', totalNoche)
-
-    const subtotalJugadores = calcularSubtotalJugadores({
-      totalDia,
-      totalNoche,
-      precioJefe,
-      precioSupervisor
-    })
-
-    const subtotal = subtotalJugadores + toFloat(precioTotalServicios)
-
-    setFormData('subtotal', subtotal)
-    actualizarTotal(subtotal, descuentoPor, costoExtra)
-  }
-
   const calcularTotalGastosCompras = ({
     subtotal,
     descuento_monto,
@@ -100,8 +50,6 @@ export const useCalculosTotales = ({ formData, setFormData }) => {
   }
 
   return {
-    recalcularTotales,
-    calcularJugadoresTotal,
     actualizarTotal,
     calcularTotalGastosCompras
   }

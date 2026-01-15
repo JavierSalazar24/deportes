@@ -42,8 +42,8 @@ class CategoriaController extends Controller
             'temporada_id' => 'required|exists:temporadas,id',
             'nombre' => 'required|string',
             'genero' => 'required|in:Hombre,Mujer',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin' => 'required|date',
+            'fecha_inicio' => 'required|date|before:fecha_fin',
+            'fecha_fin' => 'required|date|after:fecha_inicio',
         ]);
 
         if(Categoria::where('temporada_id',$data['temporada_id'])->where('nombre',$data['nombre'])->exists()){
@@ -83,8 +83,8 @@ class CategoriaController extends Controller
             'temporada_id' => 'sometimes|exists:temporadas,id',
             'nombre' => 'sometimes|string',
             'genero' => 'sometimes|in:Hombre,Mujer',
-            'fecha_inicio' => 'sometimes|date',
-            'fecha_fin' => 'sometimes|date',
+            'fecha_inicio' => 'sometimes|date|before:fecha_fin',
+            'fecha_fin' => 'sometimes|date|after:fecha_inicio',
         ]);
 
         $temporadaId = $data['temporada_id'] ?? $registro->temporada_id;
