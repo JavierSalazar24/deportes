@@ -28,7 +28,7 @@ class AvisoPartido extends Notification
     public function toMail($notifiable)
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
-        ->subject('⚽ Recordatorio: Partido de mañana')
+        ->subject('⚽ Recordatorio: Partido de hoy')
         ->markdown('emails.partidos.aviso', [
             'partido' => $this->partido,
             'usuario' => $notifiable,

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Partido;
 use Illuminate\Console\Command;
 
 class EnviarAvisosPartidos extends Command
@@ -18,7 +19,7 @@ class EnviarAvisosPartidos extends Command
      *
      * @var string
      */
-    protected $description = 'Comando para avisar un día anterior sobre partidos';
+    protected $description = 'Notifica los partidos del día (07:00 a 23:59) una sola vez';
 
     /**
      * Execute the console command.
@@ -28,30 +29,48 @@ class EnviarAvisosPartidos extends Command
     public function handle()
     {
         try {
-            $manana = \Carbon\Carbon::tomorrow()->format('Y-m-d');
-            $partidos = \App\Models\Partido::whereDate('fecha_hora', $manana)->get();
 
-            $this->info("Buscando partidos para la fecha: $manana");
-            $this->info("Se encontraron " . $partidos->count() . " partidos.");
+            $now = now();
+            $inicio = $now->copy()->startOfDay()->setTime(7, 0, 0);
+            $fin    = $now->copy()->startOfDay()->setTime(23, 59, 59);
 
-            foreach ($partidos as $partido) {
-                $this->info("Partido ID: {$partido->id}");
-                if (!$partido->categoria) {
-                    $this->error("El partido ID {$partido->id} no tiene categoría asignada.");
-                    continue;
-                }
-                $jugadores = $partido->categoria->jugadores;
+            $this->info("Buscando partidos de hoy entre {$inicio} y {$fin}...");
 
-                foreach ($jugadores as $jugador) {
-                    $usuario = $jugador->usuario;
-                    if ($usuario && $usuario->email) {
-                        $this->info("Notificando a usuario: {$usuario->email}");
-                        $usuario->notify(new \App\Notifications\AvisoPartido($partido, $jugador));
-                    } else {
-                        $this->warn("Jugador ID {$jugador->id} no tiene usuario o email.");
+            Partido::query()
+                ->with(['categoria.jugadores.usuario'])
+                ->whereNull('notificado_dia_at')
+                ->whereBetween('fecha_hora', [$inicio, $fin])
+                ->chunkById(50, function ($partidos) use ($now) {
+
+                    $this->info("Se encontraron {$partidos->count()} partidos en este bloque.");
+
+                    foreach ($partidos as $partido) {
+
+                        $claimed = Partido::whereKey($partido->id)
+                            ->whereNull('notificado_dia_at')
+                            ->update(['notificado_dia_at' => $now]);
+
+                        if ($claimed !== 1) {
+                            continue;
+                        }
+
+                        if (!$partido->categoria) {
+                            $this->error("El partido ID {$partido->id} no tiene categoría asignada.");
+                            continue;
+                        }
+
+                        foreach ($partido->categoria->jugadores as $jugador) {
+                            $usuario = $jugador->usuario;
+
+                            if ($usuario && $usuario->email) {
+                                $this->info("Notificando a: {$usuario->email} (Partido {$partido->id})");
+                                $usuario->notify(new \App\Notifications\AvisoPartido($partido, $jugador));
+                            } else {
+                                $this->warn("Jugador ID {$jugador->id} no tiene usuario o email.");
+                            }
+                        }
                     }
-                }
-            }
+                });
 
             $this->info("Avisos enviados.");
             return 0;

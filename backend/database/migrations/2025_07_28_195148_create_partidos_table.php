@@ -20,7 +20,10 @@ return new class extends Migration
             $table->string('rival');
             $table->string('lugar');
             $table->dateTime('fecha_hora');
+            $table->dateTime('notificado_dia_at')->nullable();
             $table->timestamps();
+
+            $table->index(['notificado_dia_at', 'fecha_hora']);
         });
     }
 

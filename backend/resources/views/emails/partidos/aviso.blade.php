@@ -8,7 +8,7 @@
 
 Hola, <strong>{{ $jugador->nombre }} {{ $jugador->apellido_p }} {{ $jugador->apellido_m }}</strong>
 
-Te enviamos este mensaje para recordarte del partido **programado para mañana**.
+Te enviamos este mensaje para recordarte del partido **programado para hoy**.
 Revisa los detalles y prepárate para dar lo mejor de ti en la cancha.
 
 @component('mail::panel')

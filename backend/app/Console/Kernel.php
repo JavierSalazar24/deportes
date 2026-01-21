@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('migrate:fresh --seed')->dailyAt('23:59');
         $schedule->command('limpiar:logs')->monthlyOn(1, '23:59');
-        $schedule->command('avisos:partidos')->everyMinute();
+        $schedule->command('avisos:partidos')->dailyAt('06:30')->withoutOverlapping();
+        $schedule->command('avisos:partidos')->dailyAt('06:59')->withoutOverlapping();
     }
 
     /**

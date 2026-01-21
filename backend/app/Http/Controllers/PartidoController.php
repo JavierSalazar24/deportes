@@ -21,7 +21,7 @@ class PartidoController extends Controller
     {
         $data = $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'rival' => 'required|string',
             'lugar' => 'required|string',
             'fecha_hora' => 'required|date',
@@ -59,7 +59,7 @@ class PartidoController extends Controller
 
         $data = $request->validate([
             'categoria_id' => 'sometimes|exists:categorias,id',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'rival' => 'sometimes|string',
             'lugar' => 'sometimes|string',
             'fecha_hora' => 'sometimes|date',
