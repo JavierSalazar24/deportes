@@ -1,4 +1,4 @@
-import { User, Mail, Shield, Save, Upload } from 'lucide-react'
+import { User, Mail, Shield, Save, Upload, Phone } from 'lucide-react'
 import foto_default from '../assets/imgs/usuarios/default.png'
 
 export const FormProfile = ({
@@ -42,6 +42,18 @@ export const FormProfile = ({
             onChange={handleChange}
             className='flex-1 outline-none'
             placeholder='Nombre'
+          />
+        </div>
+
+        <div className='flex items-center border rounded-md p-2'>
+          <Phone className='text-gray-500 mr-2' size={18} />
+          <input
+            type='tel'
+            name='telefono'
+            value={formData.telefono}
+            onChange={handleChange}
+            className='flex-1 outline-none'
+            placeholder='Teléfono'
           />
         </div>
 

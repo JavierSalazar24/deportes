@@ -11,6 +11,7 @@ export default function BannersPage() {
   const {
     modalType,
     add,
+    edit,
     closeModal,
     openModal,
     formData,
@@ -46,6 +47,7 @@ export default function BannersPage() {
           Inputs={
             <FormBanners
               view={view}
+              edit={edit}
               formData={formData}
               handleInputChange={handleInputChange}
               handleFileChange={handleFileChange}

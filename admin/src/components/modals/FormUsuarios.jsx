@@ -62,7 +62,7 @@ export const FormUsuarios = ({
 
       {edit && (
         <>
-          <label className='inline-flex items-center cursor-pointer'>
+          <label className='inline-flex items-center cursor-pointer md:mt-5 w-fit'>
             <input
               type='checkbox'
               name='cambiar_pass'

@@ -24,8 +24,8 @@ class TemporadaSeeder extends Seeder
             ['nombre' => 'Master',   'edad_min' => 20, 'edad_max' => 99],
         ];
 
-        $fecha_inicio = Carbon::create(2025, 7, 1);
-        $num_temporadas = 10;
+        $fecha_inicio = Carbon::create(2026, 1, 1);
+        $num_temporadas = 5;
 
         for ($i = 0; $i < $num_temporadas; $i++) {
             $fecha_fin = $fecha_inicio->copy()->addMonths(6)->subDay();

@@ -20,7 +20,7 @@ class BannerController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:50',
-            'foto' => 'required|image|mimes:jpg,jpeg,png,avif|max:2048',
+            'foto' => 'required|image|mimes:jpg,jpeg,png,avif,webp',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -55,7 +55,7 @@ class BannerController extends Controller
 
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:50',
-            'foto' => 'sometimes|image|mimes:jpg,jpeg,png,avif|max:2048',
+            'foto' => 'sometimes|image|mimes:jpg,jpeg,png,avif,webp',
         ]);
 
         if ($request->hasFile('foto')) {

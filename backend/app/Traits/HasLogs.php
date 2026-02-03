@@ -42,7 +42,6 @@ trait HasLogs
                 if (app()->runningInConsole()) {
                     return;
                 }
-                return;
             }
         }
 

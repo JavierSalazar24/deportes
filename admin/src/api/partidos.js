@@ -42,6 +42,19 @@ export const getPartido = async () => {
   }
 }
 
+// Ultimo partido
+export const getPartidoProximo = async () => {
+  try {
+    const response = await apiClient.get('partido-proximo')
+    const { data } = response
+
+    return data
+  } catch (error) {
+    console.error('Error al obetener el registro', error)
+    throw new Error(error.response.data.message)
+  }
+}
+
 // Actualizar un registro
 export const updatePartido = async (data) => {
   try {

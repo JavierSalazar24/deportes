@@ -1,4 +1,4 @@
-import { Mail, Shield } from 'lucide-react'
+import { Mail, Shield, Phone } from 'lucide-react'
 import foto_default from '../assets/imgs/usuarios/default.png'
 import { useAuth } from '../context/AuthContext'
 
@@ -24,6 +24,14 @@ export const ProfileView = () => {
           <div>
             <p className='text-sm text-gray-500'>Correo</p>
             <p className='font-medium'>{user.email}</p>
+          </div>
+        </div>
+
+        <div className='flex items-center'>
+          <Phone className='text-gray-500 mr-3' size={20} />
+          <div>
+            <p className='text-sm text-gray-500'>Celular</p>
+            <p className='font-medium'>{user.telefono}</p>
           </div>
         </div>
 

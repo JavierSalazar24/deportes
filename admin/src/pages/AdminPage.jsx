@@ -1,61 +1,62 @@
-import { AdminCards } from '../components/AdminCards'
-import AdminClock from '../components/AdminClock'
-import { EgresosChart } from '../components/EgresosChart'
-import { IngresosChart } from '../components/IngresosChart'
+import { AdminCards } from '../components/dashboard/AdminCards'
+import { GastosDistribucion } from '../components/dashboard/GastosDistribucion'
+import { IngresosVsEgresos } from '../components/dashboard/IngresosVsEgresos'
+import { PagosCategoria } from '../components/dashboard/PagosCategoria'
+import { PagosPendientes } from '../components/dashboard/PagosPendientes'
+import { PanelMeteorologico } from '../components/dashboard/PanelMeteorologico'
+import { ProximosPartidos } from '../components/dashboard/ProximosPartidos'
+import { ResumenBancos } from '../components/dashboard/ResumenBancos'
 import Loading from '../components/Loading'
-import { useAuth } from '../context/AuthContext'
-import { useGraphic } from '../hooks/useGraphic'
-import { tienePermiso } from '../utils/permisoGraficas'
-import { NoGrafica } from './NoGrafica'
+import { useDashboard } from '../hooks/useDashboard'
 
 const AdminPage = () => {
-  const {
-    ingresos,
-    isErrorIngresos,
-    isLoadingIngresos,
-    egresos,
-    isErrorEgresos,
-    isLoadingEgresos
-  } = useGraphic()
+  const { data, isLoading, isError } = useDashboard()
 
-  const { user } = useAuth()
+  if (isLoading) return <Loading />
+  if (isError)
+    return (
+      <div className='text-red-600 font-bold text-center text-lg'>
+        Ah ocurrido un error, comunicate con sistemas.
+      </div>
+    )
 
   return (
     <>
       <AdminCards />
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        {tienePermiso(user, 'movimientos-bancarios', 'consultar') ? (
-          isErrorIngresos ? (
-            <p>No se puede mostrar la gráfica de ingresos</p>
-          ) : isLoadingIngresos ? (
-            <Loading />
-          ) : (
-            <div className='col-span-6'>
-              <IngresosChart data={ingresos} />
-            </div>
-          )
-        ) : (
-          <div className='sm:col-span-6 md:col-span-1'>
-            <AdminClock />
-          </div>
-        )}
+      <PanelMeteorologico />
 
-        {tienePermiso(user, 'movimientos-bancarios', 'consultar') ? (
-          isErrorEgresos ? (
-            <p>No se puede mostrar la gráfica de egresos</p>
-          ) : isLoadingEgresos ? (
-            <Loading />
-          ) : (
-            <div className='col-span-6'>
-              <EgresosChart data={egresos} />
-            </div>
-          )
-        ) : (
-          <div className='sm:col-span-6 md:col-span-1'>
-            <NoGrafica />
-          </div>
-        )}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6'>
+        <div className='lg:col-span-2'>
+          <IngresosVsEgresos ingresosEgresos={data.ingresosEgresos} />
+        </div>
+
+        <ResumenBancos
+          movimientos={data.movimientosBancariosDia.movimientos}
+          balance={data.movimientosBancariosDia.resumen.balance}
+        />
+      </div>
+
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
+        <PagosCategoria
+          pagosCategoria={data.pagosCategoriaFemenil}
+          title='Pagos por categoría femenil'
+          subtitle='Jugadoras que ya pagaron vs pendientes'
+        />
+        <PagosCategoria
+          pagosCategoria={data.pagosCategoriaVaronil}
+          title='Pagos por categoría varonil'
+          subtitle='Jugadores que ya pagaron vs pendientes'
+        />
+      </div>
+
+      <div className='grid grid-cols-1 gap-4 mt-6'>
+        <PagosPendientes pagosPendientes={data.pagosPendientes} />
+      </div>
+
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
+        <ProximosPartidos proximosPartidos={data.proximosPartidos} />
+        <GastosDistribucion distribucionGastos={data.distribucionGastos} />
       </div>
     </>
   )

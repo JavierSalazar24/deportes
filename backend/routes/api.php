@@ -36,7 +36,9 @@ use App\Http\Controllers\PagoJugadorController;
 use App\Http\Controllers\AbonoDeudaJugadorController;
 use App\Http\Controllers\CajaPagoController;
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\TutorController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,21 +58,28 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    // ** DASHBOARD **
+    Route::get('count-adminpage', [CountPageController::class, 'getCount']);
+    Route::get('data-dashboard', [DashboardController::class, 'dataDashboard']);
+
+    // Perfil de usuario autenticado
     Route::apiResource('perfil', PerfilController::class)->only(['index', 'update']);
-    // Jugadores desde la web
+
+    // Consulta desde el portal de tutores
     Route::apiResource('jugadores-web', TutorController::class);
 });
 
-Route::get('count-adminpage', [CountPageController::class, 'getCount']);
 
 // Modulos de la API (rutas protegidas)
 Route::middleware(['auth:sanctum', 'permiso.dinamico'])->group(function () {
-    // Gráficas
-    Route::get('ingresos', [MovimientoBancarioController::class, 'ingresosMensuales']);
-    Route::get('egresos', [MovimientoBancarioController::class, 'egresosMensuales']);
+    // Partido más proximo
+    Route::get('partido-proximo', [PartidoController::class, 'partidoProximo']);
 
     // Banners
     Route::apiResource('banners', BannerController::class);
+
+    // Documentos
+    Route::apiResource('documentos', DocumentoController::class);
 
     // Jugadores
     Route::apiResource('jugadores', JugadorController::class);

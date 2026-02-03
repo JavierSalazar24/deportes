@@ -10,13 +10,13 @@ use App\Models\{
     AbonoDeudaJugador,
     Partido,
     Categoria,
-    Banner,
     CostoCategoria
 };
 use App\Helpers\ArchivosHelper;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class TutorController extends Controller
 {
@@ -95,11 +95,8 @@ class TutorController extends Controller
             ->orderBy('fecha_hora','asc')
             ->get();
 
-        // 7) Banners
-        $banners = Banner::all();
 
         return response()->json([
-            'banners'     => $banners->append('foto_url'),
             'jugadores'   => $jugadores->append(['curp_jugador_url', 'ine_url', 'acta_nacimiento_url', 'comprobante_domicilio_url', 'foto_url', 'firma_url']),
             'temporada'   => $temporada,
             'deudas'      => $deudas,
@@ -116,7 +113,7 @@ class TutorController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'required|image|mimes:jpg,jpeg,png',
             'nombre' => 'required|string|max:100',
             'apellido_p' => 'required|string|max:100',
             'apellido_m' => 'required|string|max:100',
@@ -127,11 +124,11 @@ class TutorController extends Controller
             'curp' => 'required|string|max:18|min:17',
             'padecimientos' => 'required|string|max:100',
             'alergias' => 'required|string|max:100',
-            'curp_jugador' => 'nullable|file|mimes:pdf|max:2048',
-            'ine' => 'nullable|file|mimes:pdf|max:2048',
-            'acta_nacimiento' => 'nullable|file|mimes:pdf|max:2048',
-            'comprobante_domicilio' => 'nullable|file|mimes:pdf|max:2048',
-            'firma' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'curp_jugador' => 'nullable|file|mimes:pdf',
+            'ine' => 'nullable|file|mimes:pdf',
+            'acta_nacimiento' => 'nullable|file|mimes:pdf',
+            'comprobante_domicilio' => 'nullable|file|mimes:pdf',
+            'firma' => 'required|image|mimes:jpg,jpeg,png',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -154,6 +151,10 @@ class TutorController extends Controller
         }
 
         $temporada = Temporada::where('estatus', 'Activa')->first();
+        if (!$temporada) {
+            return response()->json(['message' => 'No hay una temporada activa en este momento.'], 422);
+        }
+
         $data['temporada_id'] = $temporada->id;
         $data['usuario_id'] = auth()->id();
 
@@ -162,7 +163,7 @@ class TutorController extends Controller
             ->whereDate('fecha_fin', '>=', $request->fecha_nacimiento)
             ->first();
 
-        if(!$categoria){
+        if (!$categoria){
             return response()->json(['message' => 'Sus datos no entran en ninguna categoría disponible, por favor verifíquelos (Nacimiento y/o Genéro)'], 422);
         }
 
@@ -170,6 +171,15 @@ class TutorController extends Controller
 
         DB::beginTransaction();
         try {
+
+            if (!$categoria->costosCategoria()->exists()) {
+                throw new HttpResponseException(
+                    response()->json([
+                        'message' => 'No hay costos definidos para la categoría asignada. Por favor, contacte al administrador.'
+                    ], 422)
+                );
+            }
+
             $jugador = Jugador::create($data);
 
             $hoy       = CarbonImmutable::today();
@@ -223,7 +233,9 @@ class TutorController extends Controller
             return response()->json(['message' => 'Registro guardado'], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al registrar los datos', 'error' => $e->getMessage()], 500);
+
+            $error = $e instanceof HttpResponseException ? $e->getResponse()->getData(true) : ['message' => 'Error al registrar los datos'];
+            return response()->json(['message' => $error['message'], 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -235,7 +247,7 @@ class TutorController extends Controller
         }
 
         $data = $request->validate([
-            'foto' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'sometimes|image|mimes:jpg,jpeg,png',
             'nombre' => 'sometimes|string|max:100',
             'apellido_p' => 'sometimes|string|max:100',
             'apellido_m' => 'sometimes|string|max:100',
@@ -246,10 +258,10 @@ class TutorController extends Controller
             'curp' => 'sometimes|string|max:18|min:17',
             'padecimientos' => 'sometimes|string|max:100',
             'alergias' => 'sometimes|string|max:100',
-            'curp_jugador' => 'sometimes|file|mimes:pdf|max:2048',
-            'ine' => 'sometimes|file|mimes:pdf|max:2048',
-            'acta_nacimiento' => 'sometimes|file|mimes:pdf|max:2048',
-            'comprobante_domicilio' => 'sometimes|file|mimes:pdf|max:2048',
+            'curp_jugador' => 'sometimes|file|mimes:pdf',
+            'ine' => 'sometimes|file|mimes:pdf',
+            'acta_nacimiento' => 'sometimes|file|mimes:pdf',
+            'comprobante_domicilio' => 'sometimes|file|mimes:pdf',
         ]);
 
         if ($request->hasFile('foto')) {

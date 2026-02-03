@@ -1,4 +1,4 @@
-import { Edit, Eye, Printer, Trash2 } from 'lucide-react'
+import { Edit, Eye, FileText, Printer, Trash2 } from 'lucide-react'
 import { useLocation } from 'react-router'
 import { useAuth } from '../context/AuthContext'
 import { hasPermission } from '../helpers/permissions'
@@ -62,6 +62,18 @@ export const ActionButtons = ({ data, openModal }) => {
           rel='noopener noreferrer'
         >
           <Printer className='h-5 w-5' />
+        </a>
+      )}
+
+      {pathname === '/documentos' && (
+        <a
+          title='Ver documento PDF'
+          target='_blank'
+          href={data.documento_url}
+          className='text-yellow-600 hover:text-yellow-900 p-1 rounded-md hover:bg-red-50 cursor-pointer transition-all'
+          rel='noopener noreferrer'
+        >
+          <FileText className='h-5 w-5' />
         </a>
       )}
     </div>

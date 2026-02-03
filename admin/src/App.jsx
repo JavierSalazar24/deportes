@@ -11,43 +11,44 @@ import OnlineBanner from './components/OnlineBanner'
 
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const BannersPage = lazy(() => import('./pages/BannersPage'))
+const DocumentosPage = lazy(() => import('./pages/DocumentosPage'))
 const JugadoresPage = lazy(() => import('./pages/JugadoresPage'))
 const EquipamientoPage = lazy(() => import('./pages/EquipamientoPage'))
-const EstadoCuentaJugadoresPage = lazy(() =>
-  import('./pages/EstadoCuentaJugadoresPage')
+const EstadoCuentaJugadoresPage = lazy(
+  () => import('./pages/EstadoCuentaJugadoresPage')
 )
 const ConceptosCobrosPage = lazy(() => import('./pages/ConceptosCobrosPage'))
 const TemporadasPage = lazy(() => import('./pages/TemporadasPage'))
 const CategoriasPage = lazy(() => import('./pages/CategoriasPage'))
 const CostosCategoriaPage = lazy(() => import('./pages/CostosCategoriaPage'))
 const PartidosPage = lazy(() => import('./pages/PartidosPage'))
-const CalendarioPartidosPage = lazy(() =>
-  import('./pages/CalendarioPartidosPage')
+const CalendarioPartidosPage = lazy(
+  () => import('./pages/CalendarioPartidosPage')
 )
 const DeudasJugadoresPage = lazy(() => import('./pages/DeudasJugadoresPage'))
 const AbonosJugadoresPage = lazy(() => import('./pages/AbonosJugadoresPage'))
 const PagosJugadoresPage = lazy(() => import('./pages/PagosJugadoresPage'))
-const DeudasHistorialJugadoresPage = lazy(() =>
-  import('./pages/DeudasHistorialJugadoresPage')
+const DeudasHistorialJugadoresPage = lazy(
+  () => import('./pages/DeudasHistorialJugadoresPage')
 )
-const AbonosHistorialJugadoresPage = lazy(() =>
-  import('./pages/AbonosHistorialJugadoresPage')
+const AbonosHistorialJugadoresPage = lazy(
+  () => import('./pages/AbonosHistorialJugadoresPage')
 )
-const PagosHistorialJugadoresPage = lazy(() =>
-  import('./pages/PagosHistorialJugadoresPage')
+const PagosHistorialJugadoresPage = lazy(
+  () => import('./pages/PagosHistorialJugadoresPage')
 )
 const CalendarioPagosPage = lazy(() => import('./pages/CalendarioPagosPage'))
 const CajaPagosPage = lazy(() => import('./pages/CajaPagosPage'))
 const BancosPage = lazy(() => import('./pages/BancosPage'))
-const MovimientosBancariosPage = lazy(() =>
-  import('./pages/MovimientosBancariosPage')
+const MovimientosBancariosPage = lazy(
+  () => import('./pages/MovimientosBancariosPage')
 )
-const EstadoCuentaBancoPage = lazy(() =>
-  import('./pages/EstadoCuentaBancoPage')
+const EstadoCuentaBancoPage = lazy(
+  () => import('./pages/EstadoCuentaBancoPage')
 )
 const ProveedoresPage = lazy(() => import('./pages/ProveedoresPage'))
-const EstadoCuentaProveedorPage = lazy(() =>
-  import('./pages/EstadoCuentaProveedorPage')
+const EstadoCuentaProveedorPage = lazy(
+  () => import('./pages/EstadoCuentaProveedorPage')
 )
 const ArticulosPage = lazy(() => import('./pages/ArticulosPage'))
 const AlmacenPage = lazy(() => import('./pages/AlmacenPage'))
@@ -122,6 +123,15 @@ export default function App() {
                   element={
                     <PrivateRoute>
                       <BannersPage />
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path='/documentos'
+                  element={
+                    <PrivateRoute>
+                      <DocumentosPage />
                     </PrivateRoute>
                   }
                 />

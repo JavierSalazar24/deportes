@@ -4,6 +4,19 @@
   --color-primary: #e1251b;
   --color-primary-dark: #aa182c;
   --color-secondary: #e1251b;
+  --color-primary-hover: #db0901;
+  --color-success: #00ab78;
+  --color-success-dark: #008f61;
+  --color-info: #0082e6;
+  --color-warning: #dfa11a;
+  --color-warning-dark: #ff7f11;
+  --color-danger: #cc272e;
+  --color-action: #9b7dcd;
+  --color-muted: #808080;
+  --color-foreground: #090b0f;
+  --color-muted-foreground: #52555b;
+  --color-card: #e9ebee;
+  --color-border: #d5d7db;
 }
 
 @layer components {
@@ -63,13 +76,13 @@
 
 /* Handle */
 .sidebar::-webkit-scrollbar-thumb {
-  background: var(--color-secondary);
+  background: var(--color-primary-dark);
   border-radius: 2px;
 }
 
 /* Handle on hover */
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary);
+  background: var(--color-primary);
 }
 
 .rbc-toolbar button {

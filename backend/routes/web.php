@@ -22,6 +22,18 @@ Route::get('/api/pdf/estado-cuenta-proveedores', [EstadoCuentaController::class,
 Route::get('/api/pdf/estado-cuenta-bancos', [EstadoCuentaController::class, 'generarPdfEstadoCuentaBanco']);
 Route::get('/api/pdf/equipamiento/{id}', [EquipamientoController::class, 'equipamientoPDF']);
 
+Route::get('/docs/{path}', function ($path) {
+    $fullPath = storage_path('app/public/documentos/' . $path);
+
+    abort_unless(File::exists($fullPath), 404);
+
+    return Response::file($fullPath, [
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+        'Access-Control-Allow-Headers' => '*',
+    ]);
+})->where('path', '.*');
+
 Route::get('/cmd/{command}', function($command){
     Artisan::call($command);
     dd(Artisan::output());

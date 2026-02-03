@@ -26,10 +26,11 @@ class PerfilController extends Controller
 
         $request->validate([
             'nombre_completo' => 'sometimes|string|max:100',
+            'telefono' => 'sometimes|string|max:15',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $data = $request->only('nombre_completo', 'foto');
+        $data = $request->only('nombre_completo', 'telefono', 'foto');
 
         if ($request->hasFile('foto')) {
             if ($usuario->foto) {

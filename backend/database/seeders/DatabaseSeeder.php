@@ -16,10 +16,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             FullSistemaSeeder::class,
+            TutorSeeder::class,
+            DocumentoSeeder::class,
             BancosSeeder::class,
             TemporadaSeeder::class,
             PartidoSeeder::class,
-            TutorSeeder::class,
             ConceptosCobroSeeder::class,
             CostosCategoriaSeeder::class,
             JugadorSeeder::class,

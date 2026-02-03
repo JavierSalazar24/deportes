@@ -16,6 +16,18 @@ class PartidoController extends Controller
         return response()->json($registros->append('foto_url'));
     }
 
+    // Mostrar el partido más cercano a día de hoy
+    public function partidoProximo()
+    {
+        $registro = Partido::with('categoria')->where('fecha_hora', '>=', now())->orderBy('fecha_hora', 'asc')->first();
+
+        if (!$registro) {
+            return response()->json(['message' => 'No hay partidos próximos'], 404);
+        }
+
+        return response()->json($registro->append('foto_url'));
+    }
+
     //  * Crear un nuevo registro.
     public function store(Request $request)
     {

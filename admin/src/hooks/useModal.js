@@ -74,6 +74,10 @@ export const useModal = () => {
           value: categoria.id
         }))
 
+        if (categorias.length === 0) {
+          categorias.push({ label: 'No se encontraron categorías', value: '' })
+        }
+
         setCategorias(categorias)
       }
     }

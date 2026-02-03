@@ -19,6 +19,7 @@ class PermisoDinamicoMiddleware
 
         // Mapa de rutas auxiliares a módulos reales
         $mapAliasModulo = [
+            'partido-proximo'                  => 'partidos',
             'generar-estadocuenta-banco'       => 'estadocuenta-bancos',
             'generar-estadocuenta-jugador'     => 'estadocuenta-jugadores',
             'generar-estadocuenta-proveedor'   => 'estadocuenta-proveedores',
@@ -26,8 +27,6 @@ class PermisoDinamicoMiddleware
             'almacen-disponibles'              => 'almacen',
             'equipo-disponible'                => 'almacen',
             'generador-reportes'               => 'generador-reportes',
-            'egresos'                          => 'movimientos-bancarios',
-            'ingresos'                         => 'movimientos-bancarios',
             'temporadas-activas'               => 'temporadas',
             'filtro-categorias'                => 'categorias',
             'categoria-costo-jugador'          => 'costos-categoria',

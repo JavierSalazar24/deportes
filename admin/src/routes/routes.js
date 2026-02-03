@@ -6,6 +6,7 @@ import {
   ArrowRightLeft,
   Settings,
   FileText,
+  FileBadge,
   MonitorSmartphone,
   Volleyball,
   NotepadTextDashed,
@@ -17,6 +18,7 @@ import {
 export const routes = [
   { path: '/', label: 'Dashboard', Icon: BarChart3 },
   { path: '/banners', label: 'Banners', Icon: Image },
+  { path: '/documentos', label: 'Documentos', Icon: FileBadge },
   {
     label: 'Jugadores',
     Icon: Volleyball,

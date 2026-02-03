@@ -13,6 +13,7 @@ use App\Helpers\ArchivosHelper;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class JugadorController extends Controller
 {
@@ -77,7 +78,7 @@ class JugadorController extends Controller
         $data = $request->validate([
             'temporada_id' => 'required|exists:temporadas,id',
             'usuario_id' => 'required|exists:usuarios,id',
-            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'required|image|mimes:jpg,jpeg,png',
             'nombre' => 'required|string|max:100',
             'apellido_p' => 'required|string|max:100',
             'apellido_m' => 'required|string|max:100',
@@ -88,11 +89,11 @@ class JugadorController extends Controller
             'curp' => 'required|string|max:18|min:17',
             'padecimientos' => 'required|string|max:100',
             'alergias' => 'required|string|max:100',
-            'curp_jugador' => 'nullable|file|mimes:pdf|max:2048',
-            'ine' => 'nullable|file|mimes:pdf|max:2048',
-            'acta_nacimiento' => 'nullable|file|mimes:pdf|max:2048',
-            'comprobante_domicilio' => 'nullable|file|mimes:pdf|max:2048',
-            'firma' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'curp_jugador' => 'nullable|file|mimes:pdf',
+            'ine' => 'nullable|file|mimes:pdf',
+            'acta_nacimiento' => 'nullable|file|mimes:pdf',
+            'comprobante_domicilio' => 'nullable|file|mimes:pdf',
+            'firma' => 'required|image|mimes:jpg,jpeg,png',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -126,6 +127,14 @@ class JugadorController extends Controller
         $data['categoria_id'] = $categoria->id;
 
         DB::transaction(function () use (&$data, $categoria) {
+
+            if (!$categoria->costosCategoria()->exists()) {
+                throw new HttpResponseException(
+                    response()->json([
+                        'message' => 'No hay costos definidos para la categoría asignada. Por favor, contacte al administrador.'
+                    ], 422)
+                );
+            }
 
             $jugador = Jugador::create($data);
 
@@ -203,7 +212,7 @@ class JugadorController extends Controller
         $data = $request->validate([
             'temporada_id' => 'sometimes|exists:temporadas,id',
             'usuario_id' => 'sometimes|exists:usuarios,id',
-            'foto' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'foto' => 'sometimes|image|mimes:jpg,jpeg,png',
             'nombre' => 'sometimes|string|max:100',
             'apellido_p' => 'sometimes|string|max:100',
             'apellido_m' => 'sometimes|string|max:100',
@@ -214,11 +223,11 @@ class JugadorController extends Controller
             'curp' => 'sometimes|string|max:18|min:17',
             'padecimientos' => 'sometimes|string|max:100',
             'alergias' => 'sometimes|string|max:100',
-            'curp_jugador' => 'sometimes|file|mimes:pdf|max:2048',
-            'ine' => 'sometimes|file|mimes:pdf|max:2048',
-            'acta_nacimiento' => 'sometimes|file|mimes:pdf|max:2048',
-            'comprobante_domicilio' => 'sometimes|file|mimes:pdf|max:2048',
-            'firma' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'curp_jugador' => 'sometimes|file|mimes:pdf',
+            'ine' => 'sometimes|file|mimes:pdf',
+            'acta_nacimiento' => 'sometimes|file|mimes:pdf',
+            'comprobante_domicilio' => 'sometimes|file|mimes:pdf',
+            'firma' => 'sometimes|image|mimes:jpg,jpeg,png',
         ]);
 
         if ($request->hasFile('foto')) {

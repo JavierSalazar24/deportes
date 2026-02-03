@@ -37,6 +37,7 @@ export const updateUserProfile = async (id, profileData) => {
     const formData = new FormData()
     formData.append('_method', 'PUT')
     formData.append('nombre_completo', profileData.nombre_completo)
+    formData.append('telefono', profileData.telefono)
     if (profileData.foto instanceof File) {
       formData.append('foto', profileData.foto)
     }

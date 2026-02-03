@@ -57,6 +57,18 @@ class TutorSeeder extends Seeder
                 'actualizar'=> false,
                 'eliminar'  => false,
             ],
+            'documentos' => [
+                'crear'     => false,
+                'consultar' => true,
+                'actualizar'=> false,
+                'eliminar'  => false,
+            ],
+            'banners' => [
+                'crear'     => false,
+                'consultar' => true,
+                'actualizar'=> false,
+                'eliminar'  => false,
+            ],
         ];
 
         foreach ($permisosPorModulo as $ruta => $permisos) {
