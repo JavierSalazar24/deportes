@@ -6,8 +6,6 @@ export const getDashboard = async () => {
     const response = await apiClient.get('data-dashboard')
     const { data } = response
 
-    console.log(data)
-
     return data
   } catch (error) {
     console.error('Error al obetener el registro', error)

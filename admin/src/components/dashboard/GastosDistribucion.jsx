@@ -33,16 +33,14 @@ export const GastosDistribucion = ({ distribucionGastos }) => {
                     payload &&
                     payload.length > 0 && (
                       <div className='bg-white border border-gray-200 rounded-lg p-3 shadow-xl'>
-                        <p className='text-sm font-medium text-gray-900 mb-2'>
-                          {payload[0].name}
-                        </p>
                         {payload.map((entry, index) => (
                           <p
                             key={index}
-                            className='text-sm'
-                            style={{ color: entry.color }}
+                            className='text-sm font-medium'
+                            style={{ color: entry.payload.color }}
                           >
-                            {entry.name}: {entry.value}%
+                            {console.log(entry)}
+                            {entry.name}: {formatearMonedaMXN(entry.value)}
                           </p>
                         ))}
                       </div>

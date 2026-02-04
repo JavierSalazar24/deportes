@@ -61,6 +61,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // ** DASHBOARD **
     Route::get('count-adminpage', [CountPageController::class, 'getCount']);
     Route::get('data-dashboard', [DashboardController::class, 'dataDashboard']);
+    // Partido más proximo
+    Route::get('partido-proximo', [PartidoController::class, 'partidoProximo']);
 
     // Perfil de usuario autenticado
     Route::apiResource('perfil', PerfilController::class)->only(['index', 'update']);
@@ -72,9 +74,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Modulos de la API (rutas protegidas)
 Route::middleware(['auth:sanctum', 'permiso.dinamico'])->group(function () {
-    // Partido más proximo
-    Route::get('partido-proximo', [PartidoController::class, 'partidoProximo']);
-
     // Banners
     Route::apiResource('banners', BannerController::class);
 

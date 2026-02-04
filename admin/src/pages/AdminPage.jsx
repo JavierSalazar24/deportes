@@ -38,6 +38,15 @@ const AdminPage = () => {
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
+        <ProximosPartidos proximosPartidos={data.proximosPartidos} />
+        <GastosDistribucion distribucionGastos={data.distribucionGastos} />
+      </div>
+
+      <div className='grid grid-cols-1 gap-4 mt-6'>
+        <PagosPendientes pagosPendientes={data.pagosPendientes} />
+      </div>
+
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
         <PagosCategoria
           pagosCategoria={data.pagosCategoriaFemenil}
           title='Pagos por categoría femenil'
@@ -48,15 +57,6 @@ const AdminPage = () => {
           title='Pagos por categoría varonil'
           subtitle='Jugadores que ya pagaron vs pendientes'
         />
-      </div>
-
-      <div className='grid grid-cols-1 gap-4 mt-6'>
-        <PagosPendientes pagosPendientes={data.pagosPendientes} />
-      </div>
-
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
-        <ProximosPartidos proximosPartidos={data.proximosPartidos} />
-        <GastosDistribucion distribucionGastos={data.distribucionGastos} />
       </div>
     </>
   )

@@ -4,7 +4,9 @@ import { getPartidoProximo } from '../api/partidos'
 export const usePartidoProximo = () => {
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ['partido-proximo'],
-    queryFn: getPartidoProximo
+    queryFn: getPartidoProximo,
+    retry: 1,
+    refetchOnWindowFocus: false
   })
 
   return {

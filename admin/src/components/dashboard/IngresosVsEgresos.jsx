@@ -12,7 +12,6 @@ import {
 } from 'recharts'
 import { BarChart3, TrendingUp } from 'lucide-react'
 import { CustomTooltip } from './CustomTooltip'
-import { formatearMonedaMXN } from '../../utils/formattedCurrancy'
 
 export function IngresosVsEgresos({ ingresosEgresos }) {
   const [chartType, setChartType] = useState('area')
@@ -89,7 +88,7 @@ export function IngresosVsEgresos({ ingresosEgresos }) {
                   <YAxis
                     stroke='#6b7280'
                     fontSize={12}
-                    tickFormatter={(value) => `${formatearMonedaMXN(value)}`}
+                    tickFormatter={(value) => `$${value / 1000}K`}
                   />
                   <Tooltip
                     content={
@@ -126,7 +125,7 @@ export function IngresosVsEgresos({ ingresosEgresos }) {
                   <YAxis
                     stroke='#6b7280'
                     fontSize={12}
-                    tickFormatter={(value) => `$${value / 1000000}M`}
+                    tickFormatter={(value) => `$${value / 1000}K`}
                   />
                   <Tooltip
                     content={
